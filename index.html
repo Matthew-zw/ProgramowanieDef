@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klient Zarządzania Projektami</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Zarządzanie Projektami</h1>
+
+<div class="container">
+  <div class="panel projects-panel">
+    <h2>Projekty</h2>
+    <button id="add-project-btn">Dodaj Projekt</button>
+    <ul id="project-list">
+
+      <li class="loading">Ładowanie projektów...</li>
+    </ul>
+
+    <div id="project-form-container" class="form-container hidden">
+      <h3 id="project-form-title">Nowy Projekt</h3>
+      <form id="project-form">
+        <input type="hidden" id="project-id"> <!-- Do edycji -->
+        <div>
+          <label for="project-name">Nazwa:</label>
+          <input type="text" id="project-name" required maxlength="100">
+        </div>
+        <div>
+          <label for="project-description">Opis:</label>
+          <textarea id="project-description" maxlength="500"></textarea>
+        </div>
+        <div>
+          <label for="project-start-date">Data rozpoczęcia:</label>
+          <input type="date" id="project-start-date">
+        </div>
+        <div>
+          <label for="project-end-date">Data zakończenia:</label>
+          <input type="date" id="project-end-date">
+        </div>
+        <div class="form-buttons">
+          <button type="submit" id="save-project-btn">Zapisz</button>
+          <button type="button" id="cancel-project-btn">Anuluj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panel tasks-panel">
+    <h2 id="tasks-header">Zadania (Wybierz projekt)</h2>
+    <button id="add-task-btn" disabled>Dodaj Zadanie</button>
+    <ul id="task-list">
+      <!-- Lista zadań będzie ładowana tutaj przez JS -->
+      <li>Wybierz projekt, aby zobaczyć zadania.</li>
+    </ul>
+
+    <div id="task-form-container" class="form-container hidden">
+      <h3 id="task-form-title">Nowe Zadanie</h3>
+      <form id="task-form">
+        <input type="hidden" id="task-id">
+        <div>
+          <label for="task-title">Tytuł:</label>
+          <input type="text" id="task-title" required maxlength="150">
+        </div>
+        <div>
+          <label for="task-description">Opis:</label>
+          <textarea id="task-description" maxlength="1000"></textarea>
+        </div>
+        <div>
+          <label for="task-status">Status:</label>
+          <select id="task-status" required>
+            <option value="TODO">Do zrobienia (TODO)</option>
+            <option value="IN_PROGRESS">W toku (IN_PROGRESS)</option>
+            <option value="DONE">Zakończone (DONE)</option>
+            <option value="ON_HOLD">Wstrzymane (ON_HOLD)</option>
+          </select>
+        </div>
+        <div>
+          <label for="task-due-date">Termin wykonania:</label>
+          <input type="datetime-local" id="task-due-date">
+        </div>
+        <div class="form-buttons">
+          <button type="submit" id="save-task-btn">Zapisz</button>
+          <button type="button" id="cancel-task-btn">Anuluj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="message-area"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
