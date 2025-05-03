@@ -26,7 +26,7 @@ public class TaskService {
         TaskDTO dto = new TaskDTO();
         dto.setId(task.getId());
         dto.setTitle(task.getTitle());
-        dto.setDescripton(task.getDescription());
+        dto.setDescription(task.getDescription());
         dto.setStatus(task.getStatus());
         dto.setDueDate(task.getDueDate());
         dto.setCreatedAt(task.getCreatedAt());

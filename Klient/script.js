@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const savedProject = await handleFetchError(response);
             showMessage(`Projekt "${savedProject.name}" ${isEditing ? 'zaktualizowany' : 'zapisany'} pomyślnie.`);
             hideProjectForm();
-            fetchProjects(); // Odśwież listę projektów
+            fetchProjects();
         } catch (error) {
             showMessage(`Błąd zapisu projektu: ${error.message}`, true);
         }
@@ -188,12 +188,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         projects.forEach(project => {
             const li = document.createElement('li');
-            li.textContent = project.name;
             li.dataset.projectId = project.id;
 
             if (project.id === currentProjectId) {
                 li.classList.add('selected');
             }
+
+            const projectInfoDiv = document.createElement('div');
+            projectInfoDiv.classList.add('item-info');
+
+            const nameSpan = document.createElement('span');
+            nameSpan.classList.add('item-name');
+            nameSpan.textContent = project.name;
+            projectInfoDiv.appendChild(nameSpan);
+
+            if (project.description) {
+                const descSpan = document.createElement('span');
+                descSpan.classList.add('item-description');
+                descSpan.textContent = `Opis: ${project.description}`;
+                projectInfoDiv.appendChild(descSpan);
+            }
+
+            let dateString = '';
+            if (project.startDate) {
+                dateString += `Start: ${new Date(project.startDate).toLocaleDateString('pl-PL')}`;
+            }
+            if (project.endDate) {
+                if (dateString) dateString += ' | ';
+                dateString += `Koniec: ${new Date(project.endDate).toLocaleDateString('pl-PL')}`;
+            }
+            if (dateString) {
+                const dateSpan = document.createElement('span');
+                dateSpan.classList.add('item-dates');
+                dateSpan.textContent = dateString;
+                projectInfoDiv.appendChild(dateSpan);
+            }
+
+            li.appendChild(projectInfoDiv);
 
             const actionsDiv = document.createElement('div');
             actionsDiv.classList.add('actions');
@@ -216,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
             actionsDiv.appendChild(deleteBtn);
             li.appendChild(actionsDiv);
 
-
             li.addEventListener('click', () => {
                 const currentlySelected = projectList.querySelector('.selected');
                 if (currentlySelected) {
@@ -237,50 +267,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTaskList(projectId) {
         taskList.innerHTML = '';
-        if (tasks.length === 0) {
+        if (!tasks || tasks.length === 0) {
             taskList.innerHTML = `<li>Brak zadań dla tego projektu.</li>`;
             return;
         }
-        tasks.forEach(task => {
+
+        tasks.forEach((task, index) => {
             const li = document.createElement('li');
 
-            let dueDateStr = task.dueDate
-                ? new Date(task.dueDate).toLocaleString('pl-PL')
-                : 'Brak';
-            let statusStr = task.status.replace('_', ' ');
+            const taskInfoDiv = document.createElement('div');
+            taskInfoDiv.classList.add('item-info');
 
+            let dueDateStr = task.dueDate ? new Date(task.dueDate).toLocaleString('pl-PL') : 'Brak';
+            let statusStr = task.status ? task.status.replace('_', ' ') : 'Nieznany';
 
-            const contentSpan = document.createElement('span');
-            contentSpan.innerHTML = `
-                <strong>${task.title}</strong><br>
+            const primaryInfoSpan = document.createElement('span');
+            primaryInfoSpan.classList.add('item-primary-info');
+            primaryInfoSpan.innerHTML = `
+                <strong>${task.title || 'Bez tytułu'}</strong><br>
                 <small>Status: ${statusStr} | Termin: ${dueDateStr}</small>
             `;
-            li.appendChild(contentSpan);
+            taskInfoDiv.appendChild(primaryInfoSpan);
 
+            if (task.description && String(task.description).trim() !== '') {
+                const descSpan = document.createElement('span');
+                descSpan.classList.add('item-description');
+                descSpan.textContent = `Opis: ${task.description}`;
+                taskInfoDiv.appendChild(descSpan);
+            }
+
+            li.appendChild(taskInfoDiv);
 
             const actionsDiv = document.createElement('div');
             actionsDiv.classList.add('actions');
-
             const editBtn = document.createElement('button');
             editBtn.textContent = 'Edytuj';
             editBtn.onclick = () => showEditTaskForm(task);
-
-
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Usuń';
             deleteBtn.onclick = () => deleteTask(task.id);
-
-
             actionsDiv.appendChild(editBtn);
             actionsDiv.appendChild(deleteBtn);
             li.appendChild(actionsDiv);
 
-
             taskList.appendChild(li);
         });
     }
-
-
 
     function showAddProjectForm() {
         projectForm.reset();
@@ -295,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
         projectIdInput.value = project.id;
         projectNameInput.value = project.name;
         projectDescInput.value = project.description || '';
-        // Format daty dla input type="date" to YYYY-MM-DD
         projectStartInput.value = project.startDate || '';
         projectEndInput.value = project.endDate || '';
         projectFormTitle.textContent = `Edytuj Projekt: ${project.name}`;
@@ -335,12 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
         taskForm.reset();
     }
 
-
     addProjectBtn.addEventListener('click', showAddProjectForm);
 
-
     cancelProjectBtn.addEventListener('click', hideProjectForm);
-
 
     projectForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -369,7 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         saveTask(taskData);
     });
-
 
     fetchProjects();
 
