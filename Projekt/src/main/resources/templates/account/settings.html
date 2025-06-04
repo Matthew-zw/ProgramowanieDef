@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Ustawienia Konta</title>
+    <style>
+        .qr-code-container img { border: 1px solid #ccc; padding: 5px; margin-top: 10px; }
+        .manual-key { font-family: monospace; background-color: #f0f0f0; padding: 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+<section>
+    <h1>Ustawienia Konta</h1>
+    <p>Witaj, <strong sec:authentication="principal.username">Użytkownik</strong>!</p>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div> <!-- Jeśli będziesz używać -->
+    <div th:if="${twoFactorError}" class="alert alert-danger" th:text="${twoFactorError}"></div>
+
+
+    <h2>Uwierzytelnianie Dwuskładnikowe (2FA)</h2>
+
+    <div th:if="${twoFactorSetup.enabled}">
+        <p>Uwierzytelnianie dwuskładnikowe jest <strong>włączone</strong>.</p>
+        <form th:action="@{/account/disable-2fa}" method="post">
+            <button type="submit" class="btn delete-btn">Wyłącz 2FA</button>
+        </form>
+    </div>
+
+    <div th:unless="${twoFactorSetup.enabled}">
+        <p>Uwierzytelnianie dwuskładnikowe jest <strong>wyłączone</strong>.</p>
+        <p>Aby włączyć, zeskanuj poniższy kod QR aplikacją uwierzytelniającą (np. Google Authenticator, Authy) lub wprowadź klucz ręcznie.</p>
+
+        <div th:if="${twoFactorSetup.qrCodeUri}" class="qr-code-container">
+            <img th:src="${twoFactorSetup.qrCodeUri}" alt="Kod QR dla 2FA"/>
+        </div>
+        <div th:if="${twoFactorSetup.manualEntryKey}" style="margin-top: 15px;">
+            <p>Klucz do ręcznego wprowadzenia: <strong class="manual-key" th:text="${twoFactorSetup.manualEntryKey}"></strong></p>
+        </div>
+
+        <hr style="margin: 20px 0;"/>
+        <h3>Aktywuj 2FA</h3>
+        <p>Po skonfigurowaniu aplikacji uwierzytelniającej, wprowadź wygenerowany kod, aby zakończyć konfigurację:</p>
+        <form th:action="@{/account/enable-2fa}" th:object="${verifyCodeDto}" method="post">
+            <div class="form-group">
+                <label for="code">Kod weryfikacyjny:</label>
+                <input type="text" id="code" th:field="*{code}" required maxlength="6" style="width: 150px; display: inline-block; margin-right: 10px;"/>
+                <button type="submit" class="btn submit-btn">Aktywuj 2FA</button>
+            </div>
+            <p th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error"></p>
+        </form>
+    </div>
+
+</section>
+</body>
+</html>

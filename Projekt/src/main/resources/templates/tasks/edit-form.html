@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="'Edytuj Zadanie w Projekcie: ' + ${project.name}">Edytuj Zadanie</title>
+</head>
+<body>
+<section>
+    <h1 th:text="'Edytuj Zadanie w Projekcie: ' + ${project.name}">Edytuj Zadanie</h1>
+    <form th:action="@{/projects/{projId}/tasks/update/{taskId}(projId=${projectId}, taskId=${taskId})}" th:object="${updateTaskRequest}" method="post">
+        <div>
+            <label for="title">Tytuł Zadania:</label>
+            <input type="text" id="title" th:field="*{title}" maxlength="150" required/>
+            <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></p>
+        </div>
+        <div>
+            <label for="description">Opis:</label>
+            <textarea id="description" th:field="*{description}" maxlength="1000"></textarea>
+            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></p>
+        </div>
+        <div>
+            <label for="status">Status:</label>
+            <select id="status" th:field="*{status}" required>
+                <option th:each="stat : ${taskStatuses}" th:value="${stat}" th:text="${stat.toString()}"></option>
+            </select>
+            <p th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error"></p>
+        </div>
+        <div>
+            <label for="dueDate">Termin Wykonania:</label>
+            <input type="datetime-local" id="dueDate" th:field="*{dueDate}"/>
+            <!-- Formatting for datetime-local if value is present -->
+            <script th:inline="javascript" th:if="${updateTaskRequest.dueDate != null}">
+                /*<![CDATA[*/
+                const dateValue = /*[[${#temporals.formatISO(updateTaskRequest.dueDate)}]]*/ null;
+                if (dateValue) {
+                    document.getElementById('dueDate').value = dateValue.substring(0, 16); // YYYY-MM-DDTHH:mm
+                }
+                /*]]>*/
+            </script>
+        </div>
+        <div>
+            <button type="submit">Zaktualizuj Zadanie</button>
+            <a th:href="@{/projects/{id}/tasks(id=${projectId})}" style="margin-left:10px;">Anuluj</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

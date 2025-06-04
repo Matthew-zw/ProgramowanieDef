@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Logowanie</title>
+    <style>
+        /* === Global Resets & Base Styles (Minimalne, potrzebne dla tej strony) === */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: #f0f2f5; /* Tło całej strony */
+            color: #333;
+            display: flex; /* Potrzebne dla .container do wyśrodkowania */
+            justify-content: center; /* Wyśrodkowanie .login-container w poziomie */
+            align-items: flex-start; /* Wyrównanie do góry, jeśli .container jest niższy niż viewport */
+            min-height: 100vh;
+            padding-top: 50px; /* Aby kontener nie przylegał do góry */
+        }
+
+        /* Można dodać ogólny .container, jeśli chcesz symulować strukturę z layoutu */
+        /* Ale dla samej strony logowania może wystarczyć .login-container */
+
+
+        h1 { /* Podstawowy styl dla H1, jeśli nie ma globalnych */
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.8em;
+            line-height: 1.3;
+            font-size: 2em;
+        }
+
+        p {
+            margin-bottom: 1.2em;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+
+        /* === Login Page Styles === */
+        .login-container {
+            max-width: 450px;
+            /* margin: 50px auto;  Usunięte, bo body centruje */
+            padding: 30px 40px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        .alert {
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .login-container .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-container .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+
+        .login-container .form-group input[type="text"],
+        .login-container .form-group input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 1em;
+            color: #333;
+            background-color: #fdfdfd;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        /* Usunięto .form-control z inputów, bo style są bezpośrednio na typie */
+
+
+        .login-container .form-group input[type="text"]:focus,
+        .login-container .form-group input[type="password"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .login-container p a {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        .login-container p a:hover {
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+<!-- Nie ma tu już <nav> ani <div class="container"> z layoutu -->
+<!-- <section> jest opcjonalna, jeśli nie ma layoutu -->
+<div class="login-container"> <!-- Główny kontener dla strony logowania -->
+    <h1>Logowanie</h1>
+
+    <!-- Komunikaty o błędach/sukcesie -->
+    <!-- Zamiast th:if="${param.error}" -->
+    <div th:if="${loginError}" class="alert alert-danger" th:text="${loginError}">
+        <!-- Tekst domyślny, jeśli th:text nie zadziała -->
+    </div>
+    <!-- Zamiast th:if="${param.logout}" -->
+    <div th:if="${logoutMessage}" class="alert alert-success" th:text="${logoutMessage}">
+        <!-- Tekst domyślny -->
+    </div>
+
+    <form th:action="@{/perform_login}" method="post">
+        <div class="form-group">
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" name="username" required autofocus /> <!-- Usunięto klasę form-control -->
+        </div>
+
+        <div class="form-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" name="password" required /> <!-- Usunięto klasę form-control -->
+        </div>
+
+        <button type="submit" class="btn-login">Zaloguj się</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 25px;">
+        Nie masz konta? <a th:href="@{/register}">Zarejestruj się</a>
+    </p>
+</div>
+</body>
+</html>

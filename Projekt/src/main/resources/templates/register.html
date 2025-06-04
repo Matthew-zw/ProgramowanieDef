@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Rejestracja</title>
+    <style>
+        /* === Global Resets & Base Styles (Minimalne, potrzebne dla tej strony) === */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: #f0f2f5; /* Tło całej strony */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 30px; /* Mniejszy margines od góry dla rejestracji (więcej pól) */
+            padding-bottom: 30px; /* Margines na dole */
+        }
+
+        h1 {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.8em;
+            line-height: 1.3;
+            font-size: 2em;
+        }
+
+        p {
+            margin-bottom: 1.2em;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        /* === Registration Page Styles === */
+        .registration-container {
+            max-width: 500px; /* Nieco szerszy dla większej liczby pól */
+            padding: 30px 40px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .registration-container h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        /* Stylizacja ogólnego błędu rejestracji (np. z serwisu) */
+        .alert-registration-error {
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 0.95em;
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            text-align: center;
+        }
+        /* Stylizacja indywidualnych błędów pól (z walidacji DTO) */
+        .error { /* Klasa używana przez Thymeleaf dla błędów walidacji */
+            color: #e74c3c;
+            font-size: 0.85em;
+            margin-top: 4px;
+            display: block;
+        }
+
+
+        .registration-container .form-group {
+            margin-bottom: 18px; /* Nieco mniejszy margines między polami */
+        }
+
+        .registration-container .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 6px; /* Mniejszy margines pod etykietą */
+        }
+
+        .registration-container .form-group input[type="text"],
+        .registration-container .form-group input[type="email"],
+        .registration-container .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px 12px; /* Nieco mniejszy padding w polach */
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 0.95em; /* Nieco mniejsza czcionka w polach */
+            color: #333;
+            background-color: #fdfdfd;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .registration-container .form-group input[type="text"]:focus,
+        .registration-container .form-group input[type="email"]:focus,
+        .registration-container .form-group input[type="password"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #2ecc71; /* Zielony dla rejestracji */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 15px; /* Większy margines nad przyciskiem */
+        }
+
+        .btn-register:hover {
+            background-color: #27ae60; /* Ciemniejszy zielony */
+            transform: translateY(-1px);
+        }
+
+        .registration-container p a {
+            color: #3498db; /* Niebieski dla linku do logowania */
+            font-weight: 600;
+        }
+
+        .registration-container p a:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+<div class="registration-container">
+    <h1>Zarejestruj się</h1>
+
+    <!-- Ogólny błąd rejestracji, np. użytkownik już istnieje -->
+    <div th:if="${registrationError}" class="alert-registration-error" th:text="${registrationError}"></div>
+
+    <form th:action="@{/register}" th:object="${userRegistrationDto}" method="post">
+        <div class="form-group">
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" th:field="*{username}" required autofocus />
+            <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="fullName">Imię i nazwisko:</label>
+            <input type="text" id="fullName" th:field="*{fullName}" required />
+            <p th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Adres email:</label>
+            <input type="email" id="email" th:field="*{email}" required />
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" th:field="*{password}" required />
+            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Potwierdź hasło:</label>
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required />
+            <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error"></p>
+            <!-- Błąd dla walidacji @AssertTrue (jeśli nazwa pola w DTO to 'passwordConfirmed') -->
+            <p th:if="${#fields.hasErrors('passwordConfirmed')}" th:errors="*{passwordConfirmed}" class="error"></p>
+        </div>
+
+        <button type="submit" class="btn-register">Zarejestruj</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px;">
+        Masz już konto? <a th:href="@{/login}">Zaloguj się</a>
+    </p>
+</div>
+</body>
+</html>

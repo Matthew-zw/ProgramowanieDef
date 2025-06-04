@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Edytuj Projekt</title>
+</head>
+<body>
+<section>
+    <h1>Edytuj Projekt</h1>
+    <form th:action="@{/projects/update/{id}(id=${projectId})}" th:object="${updateProjectRequest}" method="post">
+        <div>
+            <label for="name">Nazwa Projektu:</label>
+            <input type="text" id="name" th:field="*{name}" maxlength="100" required/>
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error">Błąd nazwy</p>
+        </div>
+        <div>
+            <label for="description">Opis:</label>
+            <textarea id="description" th:field="*{description}" maxlength="500"></textarea>
+            <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error">Błąd opisu</p>
+        </div>
+        <div>
+            <label for="startDate">Data Rozpoczęcia:</label>
+            <input type="date" id="startDate" th:field="*{startDate}"/>
+        </div>
+        <div>
+            <label for="endDate">Data Zakończenia:</label>
+            <input type="date" id="endDate" th:field="*{endDate}"/>
+        </div>
+        <div>
+            <button type="submit">Zaktualizuj Projekt</button>
+            <a th:href="@{/projects}" style="margin-left:10px;">Anuluj</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

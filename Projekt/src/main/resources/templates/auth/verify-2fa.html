@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Weryfikacja Dwuskładnikowa</title>
+    <!-- Style osadzone dla uproszczenia, jeśli layout/base.html nie jest tutaj używany -->
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .verify-container { background-color: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; }
+        .verify-container h1 { color: #2c3e50; margin-bottom: 20px; font-size: 1.8em; }
+        .verify-container p { color: #555; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-weight: 600; color: #34495e; margin-bottom: 8px; }
+        .form-group input[type="text"] { width: 100%; padding: 12px 15px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 1em; }
+        .form-group input[type="text"]:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 2px rgba(52,152,219,0.2); }
+        .btn-verify { width: 100%; padding: 12px 20px; font-size: 1.1em; font-weight: 600; color: #fff; background-color: #3498db; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s ease; }
+        .btn-verify:hover { background-color: #2980b9; }
+        .error-message { color: #e74c3c; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .error { color: #e74c3c; font-size: 0.9em; margin-top: 5px; display: block; }
+    </style>
+</head>
+<body>
+<div class="verify-container">
+    <h1>Weryfikacja Dwuskładnikowa</h1>
+    <p>Wprowadź kod z aplikacji uwierzytelniającej.</p>
+
+    <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/perform_verify_2fa}" th:object="${verifyTotpCodeDto}" method="post">
+        <div class="form-group">
+            <label for="code">Kod TOTP:</label>
+            <input type="text" id="code" th:field="*{code}" required autofocus maxlength="6" />
+            <p th:if="${#fields.hasErrors('code')}" th:errors="*{code}" class="error"></p>
+        </div>
+        <button type="submit" class="btn-verify">Zweryfikuj</button>
+    </form>
+    <p style="margin-top: 20px;"><a th:href="@{/logout}">Anuluj i wyloguj</a></p>
+</div>
+</body>
+</html>

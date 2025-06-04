@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Layout Bazowy</title>
+</head>
+<body>
+<th:block th:fragment="layout(pageTitleFragment, contentFragment)">
+    <head>
+        <meta charset="UTF-8"/>
+        <title th:replace="${pageTitleFragment}">Domyślny Tytuł Strony</title>
+        <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    </head>
+    <body>
+    <nav>
+        <ul>
+            <!-- Link do Projektów - widoczny dla zalogowanych, którzy NIE SĄ adminami LUB są adminami ale chcemy im to pokazać -->
+            <!-- Jeśli admin ma widzieć TYLKO panel użytkowników, to: sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')" -->
+            <!-- Jeśli admin dziedziczy i MOŻE widzieć projekty, ale domyślnie idzie do /admin/users: sec:authorize="isAuthenticated()" -->
+            <li sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
+                <a th:href="@{/projects}">Projekty</a>
+            </li>
+
+            <!-- Link do Ustawień Konta - widoczny dla zalogowanych, którzy NIE SĄ adminami -->
+            <li sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
+                <a th:href="@{/account/settings}">Ustawienia Konta</a>
+            </li>
+
+            <!-- Link do Zarządzania Użytkownikami - widoczny tylko dla roli ADMIN -->
+            <li sec:authorize="hasRole('ROLE_ADMIN')">
+                <a th:href="@{/admin/users}">Zarządzaj Użytkownikami</a>
+            </li>
+
+            <li sec:authorize="isAuthenticated()" style="float: right; margin-right: 20px;">
+                <form th:action="@{/logout}" method="post" style="display: inline-block; margin: 0; padding: 0;">
+                    <button type="submit" class="nav-logout-btn">
+                        Wyloguj (<span sec:authentication="principal.username">Użytkownik</span>)
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div th:replace="${contentFragment}">
+            <p>Domyślna zawartość, jeśli nic nie zostanie przekazane.</p>
+        </div>
+    </div>
+    </body>
+</th:block>
+</body>
+</html>

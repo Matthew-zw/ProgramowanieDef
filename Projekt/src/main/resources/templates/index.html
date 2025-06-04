@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Strona Główna</title>
+</head>
+<body>
+<section>
+    <h1>Witaj w systemie zarządzania projektami!</h1>
+    <p>Wybierz opcję z menu, aby rozpocząć.</p>
+    <p><a th:href="@{/templates/projects}">Przejdź do Projektów</a></p>
+</section>
+</body>
+</html>

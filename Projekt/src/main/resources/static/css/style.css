@@ -1,0 +1,379 @@
+/* Global Resets & Base Styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+    background-color: #f0f2f5; /* Lżejsze tło */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px; /* Nieco szerszy kontener */
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 25px 30px; /* Więcej paddingu */
+    border-radius: 10px; /* Bardziej zaokrąglone rogi */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Subtelny cień */
+    flex-grow: 1;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600; /* Grubsze nagłówki */
+    color: #2c3e50; /* Ciemniejszy, bardziej stonowany kolor */
+    margin-bottom: 0.8em;
+    line-height: 1.3;
+}
+
+h1 { font-size: 2.2em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.5em; }
+
+p {
+    margin-bottom: 1.2em;
+}
+
+a {
+    color: #3498db; /* Jaśniejszy niebieski dla linków */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+    color: #2980b9; /* Ciemniejszy niebieski przy najechaniu */
+    text-decoration: underline;
+}
+
+/* Navigation */
+nav {
+    background: #2c3e50; /* Dopasowanie do kolorów nagłówków */
+    color: #ecf0f1;
+    padding: 15px 0; /* Większy padding */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+nav ul {
+    list-style: none;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline-block; /* Użycie inline-block dla lepszego odstępu */
+    margin: 0 20px; /* Większy margines */
+}
+
+nav ul li a {
+    color: #ecf0f1;
+    font-size: 1.1em;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+nav ul li a:hover, nav ul li a.active { /* 'active' class can be added via Thymeleaf */
+    background-color: #34495e;
+    text-decoration: none;
+}
+
+/* Lists (Projects & Tasks) */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+.project-item, .task-item {
+    background: #fdfdfd; /* Lżejsze tło dla elementów listy */
+    border: 1px solid #e0e0e0; /* Subtelniejsza ramka */
+    padding: 20px;
+    margin-bottom: 20px; /* Większy odstęp */
+    border-radius: 8px; /* Bardziej zaokrąglone rogi */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Delikatny cień na elementach */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.project-item:hover, .task-item:hover {
+    transform: translateY(-3px); /* Lekkie uniesienie przy najechaniu */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.project-item h2, .task-item h3 {
+    margin-top: 0;
+    color: #3498db; /* Kolor nagłówka elementu */
+}
+.project-item h2 a, .task-item h3 a { /* Jeśli nagłówki są linkami */
+    color: inherit;
+}
+.project-item h2 a:hover, .task-item h3 a:hover {
+    text-decoration: underline;
+}
+
+.project-item p, .task-item p {
+    color: #555; /* Ciemnoszary dla tekstu */
+    margin-bottom: 0.8em;
+}
+
+.project-item small, .task-item small {
+    color: #7f8c8d; /* Stonowany kolor dla metadanych */
+    font-size: 0.9em;
+}
+
+/* Actions (Buttons within items) */
+.actions {
+    margin-top: 15px;
+    display: flex; /* Użycie flexboxa dla lepszego wyrównania przycisków */
+    gap: 10px; /* Odstęp między przyciskami */
+    flex-wrap: wrap; /* Zawijanie przycisków na mniejszych ekranach */
+}
+
+.actions a, .actions button, .actions input[type="submit"] {
+    padding: 8px 15px; /* Dopasowanie paddingu */
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none; /* Usunięcie domyślnej ramki dla przycisków */
+    font-weight: 500;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-flex; /* Aby ikony (jeśli dodasz) dobrze się układały */
+    align-items: center;
+    justify-content: center;
+}
+
+.actions a:hover, .actions button:hover, .actions input[type="submit"]:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Specific Button Styles */
+.add-btn, .submit-btn { /* Ogólny przycisk dodawania/wysyłania */
+    background-color: #2ecc71; /* Zielony */
+    color: white;
+}
+.add-btn:hover, .submit-btn:hover { background-color: #27ae60; }
+
+.edit-btn {
+    background-color: #f39c12; /* Pomarańczowy */
+    color: white;
+}
+.edit-btn:hover { background-color: #e67e22; }
+
+.delete-btn {
+    background-color: #e74c3c; /* Czerwony */
+    color: white;
+}
+.delete-btn:hover { background-color: #c0392b; }
+
+.view-btn, .details-btn { /* Przycisk "Zobacz" / "Szczegóły" */
+    background-color: #3498db; /* Niebieski */
+    color: white;
+}
+.view-btn:hover, .details-btn:hover { background-color: #2980b9; }
+
+.cancel-btn { /* Przycisk "Anuluj" */
+    background-color: #95a5a6; /* Szary */
+    color: white;
+    margin-left: 10px; /* Aby oddzielić od głównego przycisku akcji */
+}
+.cancel-btn:hover { background-color: #7f8c8d; }
+
+/* Forms */
+form {
+    margin-top: 20px;
+}
+
+form div {
+    margin-bottom: 20px; /* Większy odstęp między polami */
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px; /* Większy odstęp pod etykietą */
+    font-weight: 600; /* Grubsza etykieta */
+    color: #34495e; /* Kolor etykiety */
+}
+
+form input[type="text"],
+form input[type="date"],
+form input[type="datetime-local"],
+form textarea,
+form select {
+    width: 100%; /* Pełna szerokość */
+    padding: 12px 15px; /* Większy padding w polach */
+    border: 1px solid #bdc3c7; /* Subtelna ramka */
+    border-radius: 6px; /* Bardziej zaokrąglone rogi */
+    font-size: 1em;
+    color: #333;
+    background-color: #fdfdfd;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form input[type="datetime-local"]:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #3498db; /* Zmiana koloru ramki przy focusie */
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); /* Delikatny cień przy focusie */
+}
+
+form textarea {
+    min-height: 120px; /* Minimalna wysokość dla textarea */
+    resize: vertical; /* Pozwolenie tylko na pionową zmianę rozmiaru */
+}
+
+form button[type="submit"], form input[type="submit"] {
+    /* Wykorzystanie istniejących klas przycisków, np. .submit-btn */
+    /* Lub dedykowany styl, jeśli potrzebny */
+    padding: 12px 25px; /* Większy padding dla głównego przycisku formularza */
+    font-size: 1.05em;
+}
+
+.form-actions { /* Kontener dla przycisków formularza */
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+
+.error {
+    color: #e74c3c; /* Czerwony dla błędów */
+    font-size: 0.9em;
+    margin-top: 5px; /* Odstęp od pola */
+    display: block; /* Aby był pod polem */
+}
+
+/* Utility classes */
+.text-center {
+    text-align: center;
+}
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+
+
+/* Basic Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 20px 15px;
+    }
+
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.5em; }
+
+    nav ul li {
+        display: block; /* Linki nawigacji jeden pod drugim */
+        margin: 10px 0;
+    }
+
+    .actions {
+        flex-direction: column; /* Przyciski akcji jeden pod drugim */
+        align-items: flex-start; /* Wyrównanie do lewej */
+    }
+    .actions a, .actions button, .actions input[type="submit"] {
+        width: 100%; /* Pełna szerokość przycisków akcji */
+        margin-bottom: 8px;
+    }
+    .actions form { /* Aby formularz wewnątrz .actions też był na całą szerokość */
+        width: 100%;
+    }
+
+    form input[type="text"],
+    form input[type="date"],
+    form input[type="datetime-local"],
+    form textarea,
+    form select {
+        font-size: 0.95em; /* Mniejsza czcionka w polach na mniejszych ekranach */
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 15px; /* Nieco mniejsza bazowa czcionka */
+    }
+    .container {
+        margin: 15px auto;
+    }
+    .project-item, .task-item {
+        padding: 15px;
+    }
+}
+/* style.css */
+.nav-logout-btn {
+    background: none;
+    border: none;
+    color: #ecf0f1; /* Kolor tekstu taki jak inne linki w nawigacji */
+    cursor: pointer;
+    font-size: 1em; /* Rozmiar czcionki jak inne linki */
+    padding: 8px 12px; /* Padding jak inne linki */
+    font-family: inherit; /* Dziedziczenie czcionki */
+    text-decoration: none; /* Usunięcie podkreślenia */
+    display: inline-block;
+}
+
+.nav-logout-btn:hover {
+    background-color: #34495e; /* Efekt hover jak inne linki */
+    text-decoration: none;
+}
+nav ul li { /* Dodaj to, jeśli jeszcze nie masz, aby float działał poprawnie */
+    display: inline-block;
+    /* ... inne style dla li ... */
+}
+
+nav ul { /* Aby float nie psuł wysokości nav */
+    overflow: auto; /* Lub clearfix hack */
+}
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse; /* Łączenie ramek komórek */
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    text-align: left; /* Wyrównanie nagłówków do lewej */
+}
+
+.table tbody + tbody {
+    border-top: 2px solid #dee2e6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.03); /* Lekkie tło dla co drugiego wiersza */
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.06); /* Efekt hover */
+}
+
+.btn-sm { /* Mniejszy przycisk */
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875em;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}

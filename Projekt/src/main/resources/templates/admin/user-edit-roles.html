@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="'Edytuj Role - ' + ${userRoleUpdateDto.username}">Edytuj Role</title>
+    <style>
+        .roles-checkbox-group label {
+            margin-right: 15px;
+            font-weight: normal; /* Normalna waga dla etykiet checkboxów */
+        }
+        .roles-checkbox-group input[type="checkbox"] {
+            margin-right: 5px;
+            vertical-align: middle; /* Lepsze wyrównanie checkboxa z tekstem */
+        }
+    </style>
+</head>
+<body>
+<section>
+    <h1 th:text="'Edytuj role dla użytkownika: ' + ${userRoleUpdateDto.username}">Edytuj Role</h1>
+
+    <form th:action="@{/admin/users/update-roles}" th:object="${userRoleUpdateDto}" method="post">
+        <input type="hidden" th:field="*{userId}" />
+        <input type="hidden" th:field="*{username}" /> <!-- Możesz usunąć, jeśli niepotrzebne w DTO -->
+
+        <div class="form-group">
+            <label>Role:</label>
+            <div class="roles-checkbox-group">
+                <th:block th:each="role : ${allRoles}">
+                    <label>
+                        <input type="checkbox" name="roleIds" th:value="${role.id}"
+                               th:checked="${#sets.contains(userRoleUpdateDto.roleIds, role.id)}"
+                               th:disabled="${userRoleUpdateDto.username == 'admin' && role.name == 'ROLE_ADMIN' && #sets.contains(userRoleUpdateDto.roleIds, role.id) && #sets.size(userRoleUpdateDto.roleIds) == 1}" />
+                        <!-- Prosta logika blokady usuwania ostatniej roli ADMIN dla użytkownika "admin" -->
+                        <span th:text="${role.name.replace('ROLE_', '')}"></span>
+                    </label>
+                </th:block>
+            </div>
+            <!-- Możesz dodać wyświetlanie błędów walidacji dla roleIds, jeśli dodasz walidację do DTO -->
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">Zapisz Zmiany</button>
+            <a th:href="@{/admin/users}" class="cancel-btn">Anuluj</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

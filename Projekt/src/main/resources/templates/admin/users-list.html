@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Zarządzanie Użytkownikami</title>
+</head>
+<body>
+<section>
+    <h1>Lista Użytkowników</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <div th:if="${users.isEmpty()}">
+        <p>Brak użytkowników do wyświetlenia.</p>
+    </div>
+
+    <table class="table table-striped table-hover" th:unless="${users.isEmpty()}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa użytkownika</th>
+            <th>Pełna nazwa</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Aktywny</th>
+            <th>Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.fullName}"></td>
+            <td th:text="${user.email}"></td>
+            <td>
+                    <span th:each="role, iterStat : ${user.roles}"
+                          th:text="${role.name.replace('ROLE_', '')} + (${iterStat.last} ? '' : ', ')"></span>
+            </td>
+            <td th:text="${user.enabled ? 'Tak' : 'Nie'}"></td>
+            <td>
+                <a th:href="@{/admin/users/edit-roles/{id}(id=${user.id})}" class="btn btn-sm edit-btn">Edytuj Role</a>
+                <!-- Możesz dodać inne akcje, np. włącz/wyłącz użytkownika -->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

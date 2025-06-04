@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="'Zadania dla Projektu: ' + ${project.name}">Zadania Projektu</title>
+</head>
+<body>
+<section>
+    <h1 th:text="'Zadania dla Projektu: ' + ${project.name}">Zadania Projektu</h1>
+    <p><a th:href="@{/projects/{id}/tasks/new(id=${projectId})}" class="actions add-btn">Dodaj Nowe Zadanie</a></p>
+    <p><a th:href="@{/projects}">« Powrót do listy projektów</a></p>
+
+    <div th:if="${tasks.isEmpty()}">
+        <p>Brak zadań dla tego projektu.</p>
+    </div>
+
+    <ul th:unless="${tasks.isEmpty()}">
+        <li th:each="task : ${tasks}" class="task-item">
+            <h3 th:text="${task.title}">Tytuł Zadania</h3>
+            <p th:text="${task.description ?: 'Brak opisu'}">Opis zadania.</p>
+            <p>
+                Status: <strong th:text="${task.status}">TODO</strong> <br/>
+                Termin: <small th:text="${task.dueDate != null ? #temporals.format(task.dueDate, 'dd-MM-yyyy HH:mm') : 'N/A'}"></small> <br/>
+                Utworzono: <small th:text="${#temporals.format(task.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
+            </p>
+            <div class="actions">
+                <a th:href="@{/projects/{projId}/tasks/edit/{taskId}(projId=${projectId}, taskId=${task.id})}" class="edit-btn">Edytuj</a>
+                <form th:action="@{/projects/{projId}/tasks/delete/{taskId}(projId=${projectId}, taskId=${task.id})}" method="post" style="display: inline;" onsubmit="return confirm('Czy na pewno chcesz usunąć to zadanie?');">
+                    <input type="submit" value="Usuń" class="delete-btn"/>
+                </form>
+            </div>
+        </li>
+    </ul>
+</section>
+</body>
+</html>
