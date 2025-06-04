@@ -21,12 +21,11 @@ import java.util.stream.Collectors;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectService projectService;
-
     private TaskDTO mapToTaskDTO(Task task){
         TaskDTO dto = new TaskDTO();
         dto.setId(task.getId());
         dto.setTitle(task.getTitle());
-        dto.setDescripton(task.getDescription());
+        dto.setDescription(task.getDescription());
         dto.setStatus(task.getStatus());
         dto.setDueDate(task.getDueDate());
         dto.setCreatedAt(task.getCreatedAt());
