@@ -17,37 +17,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/projects/{projectId}/tasks") // Tasks are always related to a project
+@RequestMapping("/projects/{projectId}/tasks")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
-    private final ProjectService projectService; // To get project name for display
-
-    // GET /projects/{projectId}/tasks - Display tasks for a specific project
+    private final ProjectService projectService;
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public String getTasksByProject(@PathVariable Long projectId, Model model) {
         List<TaskDTO> tasks = taskService.getTasksByProjectId(projectId);
         model.addAttribute("tasks", tasks);
-        model.addAttribute("project", projectService.getProjectById(projectId)); // For project info
+        model.addAttribute("project", projectService.getProjectById(projectId));
         model.addAttribute("projectId", projectId);
-        return "tasks/list"; // Thymeleaf template: templates/tasks/list.html
+        return "tasks/list";
     }
-
-    // GET /projects/{projectId}/tasks/new - Display form to create a new task for a project
     @GetMapping("/new")
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public String showCreateTaskForm(@PathVariable Long projectId, Model model) {
         model.addAttribute("createTaskRequest", new CreateTaskRequest());
         model.addAttribute("projectId", projectId);
         model.addAttribute("project", projectService.getProjectById(projectId));
         model.addAttribute("taskStatuses", TaskStatus.values()); // For status dropdown
-        return "tasks/form"; // Thymeleaf template: templates/tasks/form.html
+        return "tasks/form";
     }
 
-    // POST /projects/{projectId}/tasks - Create a new task
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public String createTask(@PathVariable Long projectId,
                              @Valid @ModelAttribute("createTaskRequest") CreateTaskRequest request,
                              BindingResult result, Model model) {
@@ -61,10 +53,7 @@ public class TaskController {
         return "redirect:/projects/" + projectId + "/tasks";
     }
 
-
-    // GET /projects/{projectId}/tasks/edit/{taskId} - Display form to edit a task
     @GetMapping("/edit/{taskId}")
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public String showUpdateTaskForm(@PathVariable Long projectId, @PathVariable Long taskId, Model model) {
         TaskDTO taskDTO = taskService.getTaskById(taskId);
         UpdateTaskRequest updateRequest = new UpdateTaskRequest();
@@ -78,11 +67,8 @@ public class TaskController {
         model.addAttribute("taskId", taskId);
         model.addAttribute("project", projectService.getProjectById(projectId));
         model.addAttribute("taskStatuses", TaskStatus.values());
-        return "tasks/edit-form"; // Thymeleaf template: templates/tasks/edit-form.html
+        return "tasks/edit-form";
     }
-
-    // POST /projects/{projectId}/tasks/update/{taskId} - Update task
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PostMapping("/update/{taskId}")
     public String updateTask(@PathVariable Long projectId, @PathVariable Long taskId,
                              @Valid @ModelAttribute("updateTaskRequest") UpdateTaskRequest request,
@@ -97,8 +83,6 @@ public class TaskController {
         taskService.updateTask(taskId, request);
         return "redirect:/projects/" + projectId + "/tasks";
     }
-
-    // POST /projects/{projectId}/tasks/delete/{taskId} - Delete task
     @PostMapping("/delete/{taskId}")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String deleteTask(@PathVariable Long projectId, @PathVariable Long taskId) {

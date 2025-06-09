@@ -28,16 +28,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String username = authentication.getName();
         User user = userRepository.findByUsername(username).orElse(null);
 
-        // Sprawdzanie, czy użytkownik jest adminem
         boolean isAdmin = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(role -> role.equals("ROLE_ADMIN"));
 
         if (isAdmin) {
-            // Jeśli admin, zawsze przekieruj do panelu zarządzania użytkownikami
-            // Nawet jeśli ma włączone 2FA, panel admina może nie wymagać 2FA dla samego admina
-            // lub 2FA jest obsługiwane inaczej dla admina.
-            // Dla uproszczenia na razie zakładamy, że admin po logowaniu idzie prosto do swojego panelu.
             response.sendRedirect(request.getContextPath() + "/admin/users");
         } else if (user != null && user.isTwoFactorEnabled()) {
             HttpSession session = request.getSession();

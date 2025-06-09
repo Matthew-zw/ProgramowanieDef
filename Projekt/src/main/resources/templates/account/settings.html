@@ -14,7 +14,7 @@
     <p>Witaj, <strong sec:authentication="principal.username">Użytkownik</strong>!</p>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div> <!-- Jeśli będziesz używać -->
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
     <div th:if="${twoFactorError}" class="alert alert-danger" th:text="${twoFactorError}"></div>
 
 

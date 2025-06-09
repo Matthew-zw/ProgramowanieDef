@@ -4,7 +4,6 @@ package com.example.projekt.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,18 +33,17 @@ public class User implements UserDetails {
 
     @NotBlank
     @Column(nullable = false)
-    private String password; // Haszowane hasło
+    private String password;
 
     @NotBlank
     @Column(length = 100)
-    private String fullName; // Imię i nazwisko
-
+    private String fullName;
     @Email
     @Column(unique = true, length = 100)
     private String email;
 
-    private boolean enabled = true; // Czy konto jest aktywne
-    @Column(length = 64) // Długość dla Base32 sekretu
+    private boolean enabled = true;
+    @Column(length = 64)
     private String twoFactorSecret;
 
     private boolean twoFactorEnabled = false;
@@ -74,9 +72,6 @@ public class User implements UserDetails {
         this.roles.remove(role);
         role.getUsers().remove(this);
     }
-
-
-    // Implementacja UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

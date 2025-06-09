@@ -28,14 +28,14 @@
         <div>
             <label for="dueDate">Termin Wykonania:</label>
             <input type="datetime-local" id="dueDate" th:field="*{dueDate}"/>
-            <!-- Formatting for datetime-local if value is present -->
+
             <script th:inline="javascript" th:if="${updateTaskRequest.dueDate != null}">
-                /*<![CDATA[*/
-                const dateValue = /*[[${#temporals.formatISO(updateTaskRequest.dueDate)}]]*/ null;
+
+                const dateValue =  null;
                 if (dateValue) {
-                    document.getElementById('dueDate').value = dateValue.substring(0, 16); // YYYY-MM-DDTHH:mm
+                    document.getElementById('dueDate').value = dateValue.substring(0, 16);
                 }
-                /*]]>*/
+
             </script>
         </div>
         <div>

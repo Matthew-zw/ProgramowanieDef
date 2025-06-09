@@ -314,36 +314,36 @@ form button[type="submit"], form input[type="submit"] {
         padding: 15px;
     }
 }
-/* style.css */
+
 .nav-logout-btn {
     background: none;
     border: none;
-    color: #ecf0f1; /* Kolor tekstu taki jak inne linki w nawigacji */
+    color: #ecf0f1;
     cursor: pointer;
-    font-size: 1em; /* Rozmiar czcionki jak inne linki */
-    padding: 8px 12px; /* Padding jak inne linki */
-    font-family: inherit; /* Dziedziczenie czcionki */
-    text-decoration: none; /* Usunięcie podkreślenia */
+    font-size: 1em;
+    padding: 8px 12px;
+    font-family: inherit;
+    text-decoration: none;
     display: inline-block;
 }
 
 .nav-logout-btn:hover {
-    background-color: #34495e; /* Efekt hover jak inne linki */
+    background-color: #34495e;
     text-decoration: none;
 }
-nav ul li { /* Dodaj to, jeśli jeszcze nie masz, aby float działał poprawnie */
+nav ul li {
     display: inline-block;
-    /* ... inne style dla li ... */
+
 }
 
-nav ul { /* Aby float nie psuł wysokości nav */
-    overflow: auto; /* Lub clearfix hack */
+nav ul {
+    overflow: auto;
 }
 .table {
     width: 100%;
     margin-bottom: 1rem;
     color: #212529;
-    border-collapse: collapse; /* Łączenie ramek komórek */
+    border-collapse: collapse;
 }
 
 .table th,
@@ -356,7 +356,7 @@ nav ul { /* Aby float nie psuł wysokości nav */
 .table thead th {
     vertical-align: bottom;
     border-bottom: 2px solid #dee2e6;
-    text-align: left; /* Wyrównanie nagłówków do lewej */
+    text-align: left;
 }
 
 .table tbody + tbody {
@@ -364,14 +364,14 @@ nav ul { /* Aby float nie psuł wysokości nav */
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.03); /* Lekkie tło dla co drugiego wiersza */
+    background-color: rgba(0, 0, 0, 0.03);
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.06); /* Efekt hover */
+    background-color: rgba(0, 0, 0, 0.06);
 }
 
-.btn-sm { /* Mniejszy przycisk */
+.btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.875em;
     line-height: 1.5;

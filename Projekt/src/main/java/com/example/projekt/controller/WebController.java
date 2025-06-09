@@ -11,7 +11,7 @@ public class WebController {
 
     @GetMapping("/")
     public String index() {
-        return "/login"; // This will serve src/main/resources/static/index.html
+        return "/login";
     }
     @GetMapping("/login")
     public String loginPage(@RequestParam(value = "error", required = false) String error,
@@ -23,6 +23,6 @@ public class WebController {
         if (logout != null) {
             model.addAttribute("logoutMessage", "Zostałeś pomyślnie wylogowany.");
         }
-        return "login"; // Zakładając, że masz templates/login.html
+        return "login";
     }
 }

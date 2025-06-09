@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
 <head>
     <title th:text="'Edytuj Role - ' + ${userRoleUpdateDto.username}">Edytuj Role</title>
     <style>
         .roles-checkbox-group label {
             margin-right: 15px;
-            font-weight: normal; /* Normalna waga dla etykiet checkboxów */
+            font-weight: normal;
         }
         .roles-checkbox-group input[type="checkbox"] {
             margin-right: 5px;
-            vertical-align: middle; /* Lepsze wyrównanie checkboxa z tekstem */
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -20,7 +20,7 @@
 
     <form th:action="@{/admin/users/update-roles}" th:object="${userRoleUpdateDto}" method="post">
         <input type="hidden" th:field="*{userId}" />
-        <input type="hidden" th:field="*{username}" /> <!-- Możesz usunąć, jeśli niepotrzebne w DTO -->
+        <input type="hidden" th:field="*{username}" />
 
         <div class="form-group">
             <label>Role:</label>
@@ -30,12 +30,11 @@
                         <input type="checkbox" name="roleIds" th:value="${role.id}"
                                th:checked="${#sets.contains(userRoleUpdateDto.roleIds, role.id)}"
                                th:disabled="${userRoleUpdateDto.username == 'admin' && role.name == 'ROLE_ADMIN' && #sets.contains(userRoleUpdateDto.roleIds, role.id) && #sets.size(userRoleUpdateDto.roleIds) == 1}" />
-                        <!-- Prosta logika blokady usuwania ostatniej roli ADMIN dla użytkownika "admin" -->
                         <span th:text="${role.name.replace('ROLE_', '')}"></span>
                     </label>
                 </th:block>
             </div>
-            <!-- Możesz dodać wyświetlanie błędów walidacji dla roleIds, jeśli dodasz walidację do DTO -->
+
         </div>
 
         <div class="form-actions">

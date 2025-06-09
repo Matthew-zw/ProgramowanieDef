@@ -22,7 +22,7 @@ public class Role {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String name; // np. ROLE_ADMIN, ROLE_MANAGER, ROLE_EMPLOYEE
+    private String name;
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
@@ -35,8 +35,6 @@ public class Role {
     public String toString() {
         return name;
     }
-
-    // equals and hashCode based on name for simplicity, or id if preferred after persistence
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

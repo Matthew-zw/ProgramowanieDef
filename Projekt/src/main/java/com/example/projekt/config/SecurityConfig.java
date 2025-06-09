@@ -23,12 +23,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true) // Umożliwia @PreAuthorize, @Secured
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
-    @Autowired // Wstrzyknięcie niestandardowego handlera
+    @Autowired
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -51,14 +51,11 @@ public class SecurityConfig {
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        // ROLE_ADMIN dziedziczy po ROLE_MANAGER, który dziedziczy po ROLE_EMPLOYEE
-        // Oznacza to, że ADMIN ma uprawnienia MANAGERA i EMPLOYEE, a MANAGER ma uprawnienia EMPLOYEE
         String hierarchy = "ROLE_ADMIN > ROLE_PROJECT_MANAGER \n ROLE_PROJECT_MANAGER > ROLE_EMPLOYEE";
         roleHierarchy.setHierarchy(hierarchy);
         return roleHierarchy;
     }
 
-    // Ten bean jest potrzebny, aby RoleHierarchy działało z @PreAuthorize i w Thymeleaf
     @Bean
     public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
@@ -73,23 +70,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                         .requestMatchers("/", "/login", "/register", "/error", "/verify-2fa", "/perform_verify_2fa").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Dostęp tylko dla admina
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/projects").hasRole("PROJECT_MANAGER")
                         .requestMatchers("/projects/new").hasRole("PROJECT_MANAGER")
                         .requestMatchers("/projects/edit/**").hasRole("PROJECT_MANAGER")
                         .requestMatchers(HttpMethod.POST,"/projects/delete/**").hasRole("PROJECT_MANAGER")
                         .requestMatchers("/projects/tasks/new").hasAnyRole("PROJECT_MANAGER", "EMPLOYEE")
                         .requestMatchers("/projects/tasks/edit/**").hasAnyRole("PROJECT_MANAGER", "EMPLOYEE")
-                        // Lepszym podejściem będzie użycie @PreAuthorize w kontrolerach dla bardziej granularnej kontroli
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                         .requestMatchers("/", "/login", "/register", "/error").permitAll()
-                        .anyRequest().authenticated() // Wszystkie inne żądania wymagają uwierzytelnienia
+                        .requestMatchers("/account/**").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .loginProcessingUrl("/perform_login")
-                        // .defaultSuccessUrl("/projects", true) // Usuń to, bo handler przejmuje kontrolę
-                        .successHandler(customAuthenticationSuccessHandler) // Użyj niestandardowego success handler
+                        .successHandler(customAuthenticationSuccessHandler)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -100,7 +96,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-                .authenticationProvider(authenticationProvider()); // Dodanie naszego dostawcy autentykacji
+                .authenticationProvider(authenticationProvider());
 
         return http.build();
     }

@@ -7,51 +7,45 @@ import com.example.projekt.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller; // Changed from @RestController
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-// Changed from @RestController to @Controller for Thymeleaf
 @Controller
-@RequestMapping("/projects") // Base path for all project-related views
+@RequestMapping("/projects")
 @RequiredArgsConstructor
-// @CrossOrigin // Not strictly needed for server-side rendering from the same origin
+
 public class ProjectController {
     private final ProjectService projectService;
 
-    // GET /projects - Display all projects
     @GetMapping
     public String getAllProjects(Model model) {
         model.addAttribute("projects", projectService.getAllProjects());
-        return "projects/list"; // Thymeleaf template: templates/projects/list.html
+        return "projects/list";
     }
 
-    // GET /projects/new - Display form to create a new project
     @GetMapping("/new")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String showCreateProjectForm(Model model) {
         model.addAttribute("createProjectRequest", new CreateProjectRequest());
-        return "projects/form"; // Thymeleaf template: templates/projects/form.html
+        return "projects/form";
     }
 
-    // POST /projects - Create a new Project
     @PostMapping
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String createProject(@Valid @ModelAttribute("createProjectRequest") CreateProjectRequest request,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
-            return "projects/form"; // Return to form if validation errors
+            return "projects/form";
         }
         projectService.createProject(request);
-        return "redirect:/projects"; // Redirect to project list
+        return "redirect:/projects";
     }
-    // GET /projects/edit/{projectId} - Display form to edit a project
     @GetMapping("/edit/{projectId}")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String showUpdateProjectForm(@PathVariable Long projectId, Model model) {
         ProjectDTO projectDTO = projectService.getProjectById(projectId);
-        // Map ProjectDTO to UpdateProjectRequest or use ProjectDTO directly if form fields match
         UpdateProjectRequest updateRequest = new UpdateProjectRequest();
         updateRequest.setName(projectDTO.getName());
         updateRequest.setDescription(projectDTO.getDescription());
@@ -60,24 +54,21 @@ public class ProjectController {
 
         model.addAttribute("updateProjectRequest", updateRequest);
         model.addAttribute("projectId", projectId);
-        return "projects/edit-form"; // Thymeleaf template: templates/projects/edit-form.html
+        return "projects/edit-form";
     }
-
-    // POST /projects/update/{projectId} - Update project
     @PostMapping("/update/{projectId}")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String updateProject(@PathVariable Long projectId,
                                 @Valid @ModelAttribute("updateProjectRequest") UpdateProjectRequest request,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("projectId", projectId); // Keep projectId for the form action
+            model.addAttribute("projectId", projectId);
             return "projects/edit-form";
         }
         projectService.updateProject(projectId, request);
         return "redirect:/projects";
     }
 
-    // POST /projects/delete/{projectId} - Delete project (using POST for simplicity with HTML forms)
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     @PostMapping("/delete/{projectId}")
     public String deleteProject(@PathVariable Long projectId) {
@@ -85,6 +76,4 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
-    // GET /projects/{projectId} - View project details and its tasks
-    // This will be handled by TaskController or a dedicated project details page
 }

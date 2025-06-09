@@ -10,6 +10,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserRoleUpdateDto {
     private Long userId;
-    private String username; // Do wyświetlenia
-    private Set<Long> roleIds; // Przesyłane będą ID ról, które użytkownik ma mieć
+    private String username;
+    private Set<Long> roleIds;
 }

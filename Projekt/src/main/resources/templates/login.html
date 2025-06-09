@@ -4,7 +4,6 @@
     <meta charset="UTF-8"/>
     <title>Logowanie</title>
     <style>
-        /* === Global Resets & Base Styles (Minimalne, potrzebne dla tej strony) === */
         *,
         *::before,
         *::after {
@@ -12,24 +11,19 @@
             margin: 0;
             padding: 0;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.7;
-            background-color: #f0f2f5; /* Tło całej strony */
+            background-color: #f0f2f5;
             color: #333;
-            display: flex; /* Potrzebne dla .container do wyśrodkowania */
-            justify-content: center; /* Wyśrodkowanie .login-container w poziomie */
-            align-items: flex-start; /* Wyrównanie do góry, jeśli .container jest niższy niż viewport */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
             min-height: 100vh;
-            padding-top: 50px; /* Aby kontener nie przylegał do góry */
+            padding-top: 50px;
         }
 
-        /* Można dodać ogólny .container, jeśli chcesz symulować strukturę z layoutu */
-        /* Ale dla samej strony logowania może wystarczyć .login-container */
-
-
-        h1 { /* Podstawowy styl dla H1, jeśli nie ma globalnych */
+        h1 {
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 0.8em;
@@ -49,12 +43,8 @@
             color: #2980b9;
             text-decoration: underline;
         }
-
-
-        /* === Login Page Styles === */
         .login-container {
             max-width: 450px;
-            /* margin: 50px auto;  Usunięte, bo body centruje */
             padding: 30px 40px;
             background-color: #ffffff;
             border-radius: 10px;
@@ -111,8 +101,6 @@
             background-color: #fdfdfd;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        /* Usunięto .form-control z inputów, bo style są bezpośrednio na typie */
-
 
         .login-container .form-group input[type="text"]:focus,
         .login-container .form-group input[type="password"]:focus {
@@ -151,30 +139,27 @@
     </style>
 </head>
 <body>
-<!-- Nie ma tu już <nav> ani <div class="container"> z layoutu -->
-<!-- <section> jest opcjonalna, jeśli nie ma layoutu -->
-<div class="login-container"> <!-- Główny kontener dla strony logowania -->
+
+<div class="login-container">
     <h1>Logowanie</h1>
 
-    <!-- Komunikaty o błędach/sukcesie -->
-    <!-- Zamiast th:if="${param.error}" -->
     <div th:if="${loginError}" class="alert alert-danger" th:text="${loginError}">
-        <!-- Tekst domyślny, jeśli th:text nie zadziała -->
+
     </div>
-    <!-- Zamiast th:if="${param.logout}" -->
+
     <div th:if="${logoutMessage}" class="alert alert-success" th:text="${logoutMessage}">
-        <!-- Tekst domyślny -->
+
     </div>
 
     <form th:action="@{/perform_login}" method="post">
         <div class="form-group">
             <label for="username">Nazwa użytkownika:</label>
-            <input type="text" id="username" name="username" required autofocus /> <!-- Usunięto klasę form-control -->
+            <input type="text" id="username" name="username" required autofocus />
         </div>
 
         <div class="form-group">
             <label for="password">Hasło:</label>
-            <input type="password" id="password" name="password" required /> <!-- Usunięto klasę form-control -->
+            <input type="password" id="password" name="password" required />
         </div>
 
         <button type="submit" class="btn-login">Zaloguj się</button>

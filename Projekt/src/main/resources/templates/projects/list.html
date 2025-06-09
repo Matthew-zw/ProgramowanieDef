@@ -8,7 +8,6 @@
 <section>
     <h1>Projekty</h1>
 
-    <!-- Przycisk "Dodaj Nowy Projekt" - widoczny tylko dla PROJECT_MANAGER (i ADMIN) -->
     <p sec:authorize="hasRole('ROLE_PROJECT_MANAGER')">
         <a th:href="@{/projects/new}" class="add-btn">Dodaj Nowy Projekt</a>
     </p>
@@ -26,14 +25,11 @@
                 <small th:text="${project.endDate != null ? 'Koniec: ' + #temporals.format(project.endDate, 'dd-MM-yyyy') : 'Koniec: N/A'}"></small>
             </p>
             <div class="actions">
-                <!-- Przycisk "Zobacz Zadania" - widoczny dla wszystkich zalogowanych (w tym EMPLOYEE) -->
                 <a th:href="@{/projects/{id}/tasks(id=${project.id})}" class="view-btn">Zobacz Zadania</a>
 
-                <!-- Przycisk "Edytuj" - widoczny tylko dla PROJECT_MANAGER (i ADMIN) -->
                 <a th:href="@{/projects/edit/{id}(id=${project.id})}" class="edit-btn"
                    sec:authorize="hasRole('ROLE_PROJECT_MANAGER')">Edytuj</a>
 
-                <!-- Formularz "Usuń" - widoczny tylko dla PROJECT_MANAGER (i ADMIN) -->
                 <form th:action="@{/projects/delete/{id}(id=${project.id})}" method="post"
                       style="display: inline;" onsubmit="return confirm('Czy na pewno chcesz usunąć ten projekt i wszystkie jego zadania?');"
                       sec:authorize="hasRole('ROLE_PROJECT_MANAGER')">

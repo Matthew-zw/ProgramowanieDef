@@ -14,19 +14,14 @@
     <body>
     <nav>
         <ul>
-            <!-- Link do Projektów - widoczny dla zalogowanych, którzy NIE SĄ adminami LUB są adminami ale chcemy im to pokazać -->
-            <!-- Jeśli admin ma widzieć TYLKO panel użytkowników, to: sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')" -->
-            <!-- Jeśli admin dziedziczy i MOŻE widzieć projekty, ale domyślnie idzie do /admin/users: sec:authorize="isAuthenticated()" -->
             <li sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
                 <a th:href="@{/projects}">Projekty</a>
             </li>
 
-            <!-- Link do Ustawień Konta - widoczny dla zalogowanych, którzy NIE SĄ adminami -->
-            <li sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
+            <li sec:authorize="isAuthenticated()">
                 <a th:href="@{/account/settings}">Ustawienia Konta</a>
             </li>
 
-            <!-- Link do Zarządzania Użytkownikami - widoczny tylko dla roli ADMIN -->
             <li sec:authorize="hasRole('ROLE_ADMIN')">
                 <a th:href="@{/admin/users}">Zarządzaj Użytkownikami</a>
             </li>

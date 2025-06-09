@@ -3,8 +3,7 @@ package com.example.projekt.service;
 import com.example.projekt.Entity.Role;
 import com.example.projekt.Entity.User;
 import com.example.projekt.dto.UserRegistrationDto;
-import com.example.projekt.dto.UserRoleUpdateDto; // Import
-import com.example.projekt.exception.ResourceNotFoundException; // Import, jeśli go masz
+import com.example.projekt.exception.ResourceNotFoundException;
 import com.example.projekt.exception.UserAlreadyExistAuthenticationException;
 import com.example.projekt.repository.RoleRepository;
 import com.example.projekt.repository.UserRepository;
@@ -13,16 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List; // Import
-import java.util.Set; // Import
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import com.example.projekt.dto.TwoFactorSetupDto;
-import com.example.projekt.util.TotpUtil;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -33,7 +30,6 @@ public class UserService {
 
     @Transactional
     public User registerNewUser(UserRegistrationDto registrationDto) throws UserAlreadyExistAuthenticationException {
-        // ... (istniejący kod rejestracji)
         if (userRepository.findByUsername(registrationDto.getUsername()).isPresent()) {
             throw new UserAlreadyExistAuthenticationException("Użytkownik o nazwie '" + registrationDto.getUsername() + "' już istnieje.");
         }
@@ -62,9 +58,6 @@ public class UserService {
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
-
-    // --- NOWE METODY DLA ADMINA ---
-
     @Transactional(readOnly = true)
     public List<User> findAllUsers() {
         return userRepository.findAll();
@@ -85,12 +78,6 @@ public class UserService {
     @Transactional
     public User updateUserRoles(Long userId, Set<Long> roleIds) {
         User user = findUserById(userId);
-
-        // Unikaj modyfikowania ról superadmina, jeśli taki istnieje i nie chcesz na to pozwolić
-        // if (user.getUsername().equals("admin") && !currentUserIsSuperAdmin()) {
-        // throw new AccessDeniedException("Nie można modyfikować ról głównego administratora.");
-        // }
-
         Set<Role> newRoles = roleIds.stream()
                 .map(roleId -> roleRepository.findById(roleId)
                         .orElseThrow(() -> new ResourceNotFoundException("Role", "id", roleId)))
@@ -106,21 +93,15 @@ public class UserService {
 
         TwoFactorSetupDto dto = new TwoFactorSetupDto();
         if (user.isTwoFactorEnabled()) {
-            // Jeśli 2FA jest już włączone, możemy pozwolić na wygenerowanie nowego sekretu
-            // lub po prostu wyświetlić, że jest włączone. Dla uproszczenia, na razie tylko informacja.
             dto.setEnabled(true);
-            // Nie pokazujemy sekretu ani QR, jeśli już jest ustawione i aktywne.
-            // Użytkownik musiałby najpierw wyłączyć 2FA, aby zobaczyć nowy QR.
         } else {
             String secret = TotpUtil.generateSecret();
-            user.setTwoFactorSecret(secret); // Na razie tylko ustawiamy, aktywacja po weryfikacji pierwszego kodu
-            userRepository.save(user); // Zapisz sekret w bazie
-
-            String issuer = "TwojaAplikacja"; // Zmień na nazwę swojej aplikacji
+            user.setTwoFactorSecret(secret);
+            userRepository.save(user);
+            String issuer = "TwojaAplikacja";
             String totpUri = TotpUtil.generateTotpUri(issuer, user.getUsername(), secret);
-
             dto.setEnabled(false);
-            dto.setSecret(secret); // Przekazujemy, aby użytkownik mógł zapisać (opcjonalne, jeśli QR wystarczy)
+            dto.setSecret(secret);
             dto.setManualEntryKey(secret);
             dto.setQrCodeUri(TotpUtil.generateQrCode(totpUri));
         }
@@ -149,10 +130,9 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         user.setTwoFactorEnabled(false);
-        user.setTwoFactorSecret(null); // Opcjonalnie: usuń sekret po wyłączeniu
+        user.setTwoFactorSecret(null);
         userRepository.save(user);
     }
-
     public boolean isTwoFactorEnabledForUser(String username) {
         return userRepository.findByUsername(username)
                 .map(User::isTwoFactorEnabled)
@@ -163,8 +143,25 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         if (user.getTwoFactorSecret() == null || !user.isTwoFactorEnabled()) {
-            return false; // Lub rzuć wyjątek
+            return false;
         }
         return TotpUtil.verifyCode(user.getTwoFactorSecret(), code);
+    }
+    @Transactional
+    public void deleteUserById(Long userId) {
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getName().equals(userToDelete.getUsername())) {
+            throw new IllegalArgumentException("Nie możesz usunąć własnego konta.");
+        }
+
+        // Można dodać logikę sprawdzania, czy to nie jest np. jedyne konto z rolą ADMIN
+        // if (userToDelete.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")) &&
+        //     userRepository.findAll().stream().filter(u -> u.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"))).count() <= 1) {
+        //     throw new IllegalStateException("Nie można usunąć ostatniego konta administratora.");
+        // }
+
+        userRepository.delete(userToDelete);
     }
 }

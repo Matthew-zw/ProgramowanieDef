@@ -8,7 +8,6 @@ import com.example.projekt.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,8 +32,8 @@ public class AccountController {
         String username = authentication.getName();
         TwoFactorSetupDto twoFactorSetupDto = userService.setupTwoFactorAuthentication(username);
         model.addAttribute("twoFactorSetup", twoFactorSetupDto);
-        model.addAttribute("verifyCodeDto", new VerifyTotpCodeDto()); // Do formularza weryfikacji kodu
-        return "account/settings"; // Widok: templates/account/settings.html
+        model.addAttribute("verifyCodeDto", new VerifyTotpCodeDto());
+        return "account/settings";
     }
 
     @PostMapping("/enable-2fa")
@@ -46,12 +45,9 @@ public class AccountController {
             return "redirect:/login";
         }
         String username = authentication.getName();
-
         if (result.hasErrors()) {
-            // Jeśli są błędy walidacji DTO, musimy ponownie załadować dane dla strony
             TwoFactorSetupDto twoFactorSetupDto = userService.setupTwoFactorAuthentication(username);
             model.addAttribute("twoFactorSetup", twoFactorSetupDto);
-            // verifyCodeDto już jest w modelu z powodu @ModelAttribute
             return "account/settings";
         }
 
@@ -59,7 +55,6 @@ public class AccountController {
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Uwierzytelnianie dwuskładnikowe zostało włączone.");
         } else {
-            // Ponownie załaduj dane i dodaj błąd
             TwoFactorSetupDto twoFactorSetupDto = userService.setupTwoFactorAuthentication(username);
             model.addAttribute("twoFactorSetup", twoFactorSetupDto);
             model.addAttribute("verifyCodeDto", verifyCodeDto); // Zachowaj wpisany kod

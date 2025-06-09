@@ -23,16 +23,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class TwoFactorAuthenticationController {
 
     private final UserService userService;
-    private final UserDetailsService userDetailsService; // Do załadowania UserDetails
+    private final UserDetailsService userDetailsService;
 
     @GetMapping("/verify-2fa")
     public String showVerify2faForm(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("TEMP_AUTHENTICATED_USER") == null) {
-            return "redirect:/login"; // Jeśli nie ma tymczasowej sesji, wróć do logowania
+            return "redirect:/login";
         }
         model.addAttribute("verifyTotpCodeDto", new VerifyTotpCodeDto());
-        return "auth/verify-2fa"; // Widok: templates/auth/verify-2fa.html
+        return "auth/verify-2fa";
     }
 
     @PostMapping("/perform_verify_2fa")
@@ -54,16 +54,13 @@ public class TwoFactorAuthenticationController {
         }
 
         if (userService.verifyTotpCodeForUser(username, verifyDto.getCode())) {
-            // Kod poprawny, w pełni uwierzytelnij użytkownika
             session.removeAttribute("TEMP_AUTHENTICATED_USER");
-
-            // Załaduj UserDetails, aby uzyskać authorities
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            return "redirect:/projects"; // Przekieruj na stronę główną po udanej weryfikacji 2FA
+            return "redirect:/projects";
         } else {
             model.addAttribute("errorMessage", "Nieprawidłowy kod uwierzytelniający.");
             return "auth/verify-2fa";

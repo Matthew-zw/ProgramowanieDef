@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
 <head>
     <title>Zarządzanie Użytkownikami</title>
@@ -34,13 +34,18 @@
             <td th:text="${user.fullName}"></td>
             <td th:text="${user.email}"></td>
             <td>
-                    <span th:each="role, iterStat : ${user.roles}"
-                          th:text="${role.name.replace('ROLE_', '')} + (${iterStat.last} ? '' : ', ')"></span>
+                <span th:each="role, iterStat : ${user.roles}"
+                      th:text="${role.name.replace('ROLE_', '')} + (${iterStat.last} ? '' : ', ')"></span>
             </td>
             <td th:text="${user.enabled ? 'Tak' : 'Nie'}"></td>
             <td>
                 <a th:href="@{/admin/users/edit-roles/{id}(id=${user.id})}" class="btn btn-sm edit-btn">Edytuj Role</a>
-                <!-- Możesz dodać inne akcje, np. włącz/wyłącz użytkownika -->
+                <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post"
+                      style="display: inline-block; margin-left: 5px;"
+                      th:if="${#authentication.principal.username != user.username}"
+                      th:attr="onsubmit='return confirm(\'Czy na pewno chcesz usunąć użytkownika \\\'\' + \'' + ${user.username} + '\'\\\'? Tej operacji nie można cofnąć.\');'">
+                    <button type="submit" class="btn btn-sm delete-btn">Usuń</button>
+                </form>
             </td>
         </tr>
         </tbody>

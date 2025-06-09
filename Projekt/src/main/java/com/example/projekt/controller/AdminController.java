@@ -1,9 +1,8 @@
 package com.example.projekt.controller;
-
-
 import com.example.projekt.Entity.Role;
 import com.example.projekt.Entity.User;
 import com.example.projekt.dto.UserRoleUpdateDto;
+import com.example.projekt.exception.ResourceNotFoundException;
 import com.example.projekt.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,24 +18,20 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasRole('ROLE_ADMIN')") // Zabezpieczenie całego kontrolera dla roli ADMIN
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequiredArgsConstructor
 public class AdminController {
 
     private final UserService userService;
-
-    // Wyświetlanie listy wszystkich użytkowników
     @GetMapping("/users")
     public String listUsers(Model model) {
         model.addAttribute("users", userService.findAllUsers());
-        return "admin/users-list"; // Widok: templates/admin/users-list.html
+        return "admin/users-list";
     }
-
-    // Wyświetlanie formularza edycji ról dla konkretnego użytkownika
     @GetMapping("/users/edit-roles/{userId}")
     public String showEditUserRolesForm(@PathVariable Long userId, Model model) {
         User user = userService.findUserById(userId);
-        List<Role> allRoles = userService.findAllRoles(); // Pobierz wszystkie dostępne role
+        List<Role> allRoles = userService.findAllRoles();
 
         UserRoleUpdateDto dto = new UserRoleUpdateDto();
         dto.setUserId(user.getId());
@@ -44,20 +39,16 @@ public class AdminController {
         dto.setRoleIds(user.getRoles().stream().map(Role::getId).collect(Collectors.toSet()));
 
         model.addAttribute("userRoleUpdateDto", dto);
-        model.addAttribute("allRoles", allRoles); // Przekaż wszystkie role do widoku
-        return "admin/user-edit-roles"; // Widok: templates/admin/user-edit-roles.html
+        model.addAttribute("allRoles", allRoles);
+        return "admin/user-edit-roles";
     }
-
-    // Przetwarzanie formularza edycji ról
     @PostMapping("/users/update-roles")
     public String updateUserRoles(@Valid @ModelAttribute("userRoleUpdateDto") UserRoleUpdateDto userRoleUpdateDto,
-                                  BindingResult result, // Na razie DTO nie ma walidacji, ale można dodać
+                                  BindingResult result,
                                   RedirectAttributes redirectAttributes,
-                                  Model model) { // Model na wypadek błędów bez redirect
+                                  Model model) {
 
         if (result.hasErrors()) {
-            // Jeśli DTO miałoby walidacje, tutaj można by je obsłużyć
-            // Trzeba by ponownie załadować 'allRoles' do modelu
             model.addAttribute("allRoles", userService.findAllRoles());
             return "admin/user-edit-roles";
         }
@@ -66,8 +57,22 @@ public class AdminController {
             userService.updateUserRoles(userRoleUpdateDto.getUserId(), userRoleUpdateDto.getRoleIds());
             redirectAttributes.addFlashAttribute("successMessage", "Role użytkownika " + userRoleUpdateDto.getUsername() + " zostały zaktualizowane.");
         } catch (Exception e) {
-            // Lepsza obsługa błędów, np. ResourceNotFoundException
             redirectAttributes.addFlashAttribute("errorMessage", "Wystąpił błąd podczas aktualizacji ról: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+    @PostMapping("/users/delete/{userId}")
+    public String deleteUser(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.findUserById(userId);
+            userService.deleteUserById(userId);
+            redirectAttributes.addFlashAttribute("successMessage", "Użytkownik '" + user.getUsername() + "' został pomyślnie usunięty.");
+        } catch (ResourceNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Nie znaleziono użytkownika o podanym ID.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Wystąpił błąd podczas usuwania użytkownika: " + e.getMessage());
         }
         return "redirect:/admin/users";
     }

@@ -1,6 +1,4 @@
 package com.example.projekt.util;
-
-
 public class Base32Encoder {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     private static final int BITS_PER_CHAR = 5;
@@ -24,7 +22,6 @@ public class Base32Encoder {
                 result.append(ALPHABET.charAt((buffer >> bitsLeft) & MASK));
             }
         }
-
         if (bitsLeft > 0) {
             buffer = buffer << (BITS_PER_CHAR - bitsLeft);
             result.append(ALPHABET.charAt(buffer & MASK));

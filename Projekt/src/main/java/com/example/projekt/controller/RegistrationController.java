@@ -36,7 +36,7 @@ public class RegistrationController {
     @PostMapping
     public String registerUserAccount(@Valid @ModelAttribute("userRegistrationDto") UserRegistrationDto registrationDto,
                                       BindingResult result,
-                                      RedirectAttributes redirectAttributes) { // Usunięto Model, bo błędy będą w BindingResult
+                                      RedirectAttributes redirectAttributes) {
 
         if (userService.usernameExists(registrationDto.getUsername())) {
             result.addError(new FieldError("userRegistrationDto", "username", "Nazwa użytkownika jest już zajęta."));
@@ -45,10 +45,9 @@ public class RegistrationController {
             result.addError(new FieldError("userRegistrationDto", "email", "Adres email jest już zajęty."));
         }
 
-        // Walidacja @AssertTrue dla passwordConfirmed jest sprawdzana przez @Valid, błąd będzie w result.
 
         if (result.hasErrors()) {
-            return "register"; // Wróć do formularza z błędami w BindingResult
+            return "register";
         }
 
         try {
@@ -56,9 +55,7 @@ public class RegistrationController {
             redirectAttributes.addFlashAttribute("registrationSuccess", "Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.");
             return "redirect:/login";
         } catch (UserAlreadyExistAuthenticationException e) {
-            // Ten blok może teraz nie być potrzebny, jeśli powyższe walidacje łapią wszystko.
-            // Ale jeśli serwis rzuci ten wyjątek z innego powodu:
-            result.reject("user.exists.general", e.getMessage()); // Dodanie błędu globalnego
+            result.reject("user.exists.general", e.getMessage());
             return "register";
         }
     }

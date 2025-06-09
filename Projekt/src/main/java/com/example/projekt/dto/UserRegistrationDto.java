@@ -1,9 +1,6 @@
 package com.example.projekt.dto;
-
-
 import jakarta.validation.constraints.*;
 import lombok.Data;
-
 @Data
 public class UserRegistrationDto {
 
@@ -13,7 +10,6 @@ public class UserRegistrationDto {
 
     @NotBlank(message = "Hasło jest wymagane.")
     @Size(min = 6, max = 100, message = "Hasło musi mieć od 6 do 100 znaków.")
-    // Możesz dodać @Pattern dla bardziej złożonych wymagań hasła
     private String password;
 
     @NotBlank(message = "Potwierdzenie hasła jest wymagane.")
