@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="'Przypisz Użytkowników do Projektu: ' + ${assignUsersDto.projectName}"></title>
+    <style>
+        .user-checkbox-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        .user-checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<section>
+    <h1 th:text="'Przypisz użytkowników do projektu: ' + ${assignUsersDto.projectName}">Przypisz Użytkowników</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/projects/assign-users}" th:object="${assignUsersDto}" method="post">
+        <input type="hidden" th:field="*{projectId}" />
+        <input type="hidden" th:field="*{projectName}" />
+
+        <div class="form-group">
+            <label>Wybierz użytkowników do przypisania:</label>
+            <div class="user-checkbox-group" th:if="${!allAvailableUsers.isEmpty()}">
+                <th:block th:each="user : ${allAvailableUsers}">
+                    <div>
+                        <label>
+                            <input type="checkbox" name="userIds" th:value="${user.id}"
+                                   th:checked="${#sets.contains(assignUsersDto.userIds, user.id)}" />
+                            <span th:text="${user.fullName} + ' (' + ${user.username} + ')'"></span>
+                        </label>
+                    </div>
+                </th:block>
+            </div>
+            <p th:if="${allAvailableUsers.isEmpty()}">Brak dostępnych użytkowników do przypisania.</p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">Zapisz Przypisania</button>
+            <a th:href="@{/projects}" class="cancel-btn">Anuluj</a>
+        </div>
+    </form>
+
+</section>
+</body>
+</html>
