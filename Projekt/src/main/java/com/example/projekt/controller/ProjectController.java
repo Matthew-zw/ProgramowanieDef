@@ -11,7 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.projekt.dto.AssignUsersToProjectDto;
+import com.example.projekt.dto.UserDTO;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/projects")
 @RequiredArgsConstructor
@@ -19,11 +24,6 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
     private final ProjectService projectService;
 
-    @GetMapping
-    public String getAllProjects(Model model) {
-        model.addAttribute("projects", projectService.getAllProjects());
-        return "projects/list";
-    }
 
     @GetMapping("/new")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
@@ -74,6 +74,41 @@ public class ProjectController {
     public String deleteProject(@PathVariable Long projectId) {
         projectService.deleteProject(projectId);
         return "redirect:/projects";
+    }
+    @GetMapping("/assign-users/{projectId}")
+    @PreAuthorize("hasAuthority('ROLE_PROJECT_MANAGER')")
+    public String showAssignUsersForm(@PathVariable Long projectId, Model model) {
+        ProjectDTO project = projectService.getProjectById(projectId);
+        Set<UserDTO> assignedUsers = projectService.getAssignedUsersForProject(projectId);
+        List<UserDTO> allUsers = projectService.getAllUsersAvailableForAssignment();
+
+        AssignUsersToProjectDto dto = new AssignUsersToProjectDto();
+        dto.setProjectId(project.getId());
+        dto.setProjectName(project.getName());
+        dto.setUserIds(assignedUsers.stream().map(UserDTO::getId).collect(Collectors.toSet()));
+
+        model.addAttribute("assignUsersDto", dto);
+        model.addAttribute("allAvailableUsers", allUsers);
+        return "projects/assign-users-form";
+    }
+
+
+    @PostMapping("/assign-users")
+    @PreAuthorize("hasAuthority('ROLE_PROJECT_MANAGER')")
+    public String processAssignUsers(@ModelAttribute("assignUsersDto") AssignUsersToProjectDto dto,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            projectService.assignUsersToProject(dto.getProjectId(), dto.getUserIds());
+            redirectAttributes.addFlashAttribute("successMessage", "Użytkownicy zostali pomyślnie przypisani do projektu '" + dto.getProjectName() + "'.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Wystąpił błąd podczas przypisywania użytkowników: " + e.getMessage());
+        }
+        return "redirect:/projects";
+    }
+    @GetMapping
+    public String listProjects(Model model) {
+        model.addAttribute("projects", projectService.getProjectsForCurrentUser());
+        return "projects/list";
     }
 
 }

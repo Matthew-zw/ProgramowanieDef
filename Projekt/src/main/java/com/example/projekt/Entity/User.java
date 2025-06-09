@@ -4,13 +4,12 @@ package com.example.projekt.Entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,8 +20,8 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements UserDetails {
-
+public class User implements UserDetails, Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -109,7 +108,6 @@ public class User implements UserDetails {
         return enabled;
     }
 
-    // equals and hashCode based on username or id
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,4 +119,8 @@ public class User implements UserDetails {
     public int hashCode() {
         return username != null ? username.hashCode() : 0;
     }
+    @ManyToMany(mappedBy = "assignedUsers", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Project> projects = new HashSet<>();
 }

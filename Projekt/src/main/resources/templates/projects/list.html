@@ -35,6 +35,8 @@
                       sec:authorize="hasRole('ROLE_PROJECT_MANAGER')">
                     <input type="submit" value="Usuń" class="delete-btn"/>
                 </form>
+                <a th:href="@{/projects/assign-users/{id}(id=${project.id})}" class="btn view-btn"
+                sec:authorize="hasAuthority('ROLE_PROJECT_MANAGER')">Przypisz Użytkowników</a>
             </div>
         </li>
     </ul>
