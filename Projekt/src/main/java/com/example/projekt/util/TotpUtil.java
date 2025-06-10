@@ -114,7 +114,7 @@ public class TotpUtil {
         }
     }
     private static String urlEncode(String input) {
-        return input.replace(":", "%3A").replace(" ", "%20").replace("/", "%2F");
+        return input.replace(":", "%3A").replace(" ", "%20").replace("/", "%2F").replace("@", "%40");
     }
 
     private static boolean isUrlSafe(char c) {
