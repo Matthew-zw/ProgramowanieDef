@@ -1,4 +1,3 @@
-
 package com.example.projekt.config;
 
 import com.example.projekt.Entity.User;
@@ -28,18 +27,22 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String username = authentication.getName();
         User user = userRepository.findByUsername(username).orElse(null);
 
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN"));
-
-        if (isAdmin) {
-            response.sendRedirect(request.getContextPath() + "/admin/users");
-        } else if (user != null && user.isTwoFactorEnabled()) {
+        // Najpierw sprawdzamy, czy użytkownik (niezależnie od roli) ma włączone 2FA
+        if (user != null && user.isTwoFactorEnabled()) {
             HttpSession session = request.getSession();
             session.setAttribute("TEMP_AUTHENTICATED_USER", username);
             response.sendRedirect(request.getContextPath() + "/verify-2fa");
         } else {
-            response.sendRedirect(request.getContextPath() + "/projects");
+            // Jeśli 2FA nie jest włączone, wtedy decydujemy na podstawie roli
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+            if (isAdmin) {
+                response.sendRedirect(request.getContextPath() + "/admin/users");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/projects");
+            }
         }
     }
 }
