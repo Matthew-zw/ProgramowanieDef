@@ -1,9 +1,7 @@
 package com.example.projekt.config;
 
-
 import com.example.projekt.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,8 +26,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler; // Zmieniono na 'final'
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -63,7 +61,6 @@ public class SecurityConfig {
         return expressionHandler;
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -77,9 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/projects/delete/**").hasRole("PROJECT_MANAGER")
                         .requestMatchers("/projects/tasks/new").hasAnyRole("PROJECT_MANAGER", "EMPLOYEE")
                         .requestMatchers("/projects/tasks/edit/**").hasAnyRole("PROJECT_MANAGER", "EMPLOYEE")
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
-                        .requestMatchers("/", "/login", "/register", "/error").permitAll()
-                        .requestMatchers("/account/**").authenticated()
+                        .requestMatchers("/account/**").authenticated() // Sprawdź, czy ta linia nie jest duplikatem, ani nie ma konfliktu
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
@@ -98,8 +93,7 @@ public class SecurityConfig {
                 )
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp
-                                        .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none';")
-
+                                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none';")
                         )
                         .frameOptions(frameOptions -> frameOptions.deny())
                         .xssProtection(xss -> xss.disable())
@@ -112,5 +106,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
