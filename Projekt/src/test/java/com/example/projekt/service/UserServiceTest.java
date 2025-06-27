@@ -408,4 +408,11 @@ class UserServiceTest {
         assertEquals("Nie możesz usunąć własnego konta.", thrown.getMessage());
         verify(userRepository, never()).delete(any(User.class));
     }
+
+    @Test
+    void isTwoFactorEnabledForUser_userNotFound_returnsFalse() {
+        when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
+
+        assertFalse(userService.isTwoFactorEnabledForUser("nonexistent"));
+    }
 }

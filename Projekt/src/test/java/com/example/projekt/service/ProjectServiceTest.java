@@ -403,4 +403,16 @@ class ProjectServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> projectService.getProjectsForCurrentUser());
     }
+
+    @Test
+    void getProjectsForCurrentUser_unauthenticatedUser_returnsEmptyList() {
+        // Symulujemy brak zalogowanego użytkownika
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        List<ProjectDTO> projects = projectService.getProjectsForCurrentUser();
+
+        assertTrue(projects.isEmpty());
+        verify(projectRepository, never()).findAll();
+        verify(projectRepository, never()).findProjectsByAssignedUserId(anyLong());
+    }
 }

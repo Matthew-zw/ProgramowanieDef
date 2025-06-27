@@ -84,7 +84,6 @@ public class TaskController {
         return "redirect:/projects/" + projectId + "/tasks";
     }
     @PostMapping("/delete/{taskId}")
-    @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String deleteTask(@PathVariable Long projectId, @PathVariable Long taskId) {
         taskService.deleteTask(taskId);
         return "redirect:/projects/" + projectId + "/tasks";
