@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-public class AssignUsersToProjectDto {
+public final class AssignUsersToProjectDto {
     private Long projectId;
     private String projectName;
     private Set<Long> userIds;

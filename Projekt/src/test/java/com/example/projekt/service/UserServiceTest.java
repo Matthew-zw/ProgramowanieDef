@@ -415,4 +415,24 @@ class UserServiceTest {
 
         assertFalse(userService.isTwoFactorEnabledForUser("nonexistent"));
     }
+
+    @Test
+    void deleteUserById_cannotDeleteSelf_throwsException() {
+        // Ustaw, że zalogowany użytkownik to ten, którego próbujemy usunąć
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn(testUser.getUsername());
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Asercja
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.deleteUserById(testUser.getId());
+        });
+
+        assertEquals("Nie możesz usunąć własnego konta.", exception.getMessage());
+        verify(userRepository, never()).delete(any());
+    }
 }

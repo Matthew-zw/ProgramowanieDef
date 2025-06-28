@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class TaskDTO {
+public final class TaskDTO {
     private Long id;
     private String title;
     private String  description;

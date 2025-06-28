@@ -7,7 +7,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CreateProjectRequest {
+public final class CreateProjectRequest {
    @NotBlank(message = "Project Name cannot be blank")
    @Size(max = 100, message = "Project name cannot exceed 100 characters")
    private String name;

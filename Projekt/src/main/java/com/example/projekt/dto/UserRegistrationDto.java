@@ -2,7 +2,7 @@ package com.example.projekt.dto;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 @Data
-public class UserRegistrationDto {
+public final class UserRegistrationDto {
 
     @NotBlank(message = "Nazwa użytkownika jest wymagana.")
     @Size(min = 3, max = 50, message = "Nazwa użytkownika musi mieć od 3 do 50 znaków.")

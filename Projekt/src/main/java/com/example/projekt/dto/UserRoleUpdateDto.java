@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
-public class UserRoleUpdateDto {
+public final class UserRoleUpdateDto {
     private Long userId;
     private String username;
     private Set<Long> roleIds;

@@ -9,7 +9,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class UpdateTaskRequest {
+public final class UpdateTaskRequest {
     @NotBlank(message = "Task title cannot be blank")
     @Size(max = 150, message = "Task title cannot exceed 150 characters")
     private String title;
