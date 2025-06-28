@@ -29,6 +29,9 @@ import com.example.projekt.config.SecurityConfig;
 import com.example.projekt.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Import;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
+
 @WebMvcTest(ProjectController.class)
 @Import(SecurityConfig.class)
 class ProjectControllerTest {
@@ -127,6 +130,32 @@ class ProjectControllerTest {
         mockMvc.perform(get("/projects/edit/99")) // Wywołujemy endpoint, który używa tej metody
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.message", is("Project not found with id : '99'")));
+    }
+
+    @Test
+    @WithMockUser(roles = "PROJECT_MANAGER")
+    void createProject_withInvalidData_shouldTriggerValidation() throws Exception {
+        // Wysyłamy żądanie z pustą nazwą, co narusza @NotBlank
+        mockMvc.perform(post("/projects").with(csrf())
+                        .param("name", "") // Puste pole
+                        .param("description", "A description"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("projects/form"))
+                .andExpect(model().attributeHasFieldErrors("createProjectRequest", "name"));
+    }
+
+    @Test
+    @WithMockUser(roles = "PROJECT_MANAGER")
+    void getProjectById_whenNotFound_shouldTriggerExceptionHandler() throws Exception {
+        // Symulujemy rzucenie wyjątku przez serwis
+        when(projectService.getProjectById(99L)).thenThrow(new ResourceNotFoundException("Project", "id", 99L));
+
+        // Testujemy endpoint, który używa tej metody
+        // Oczekujemy, że GlobalExceptionHandler przechwyci błąd i zwróci odpowiedź JSON
+        mockMvc.perform(get("/projects/edit/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json")) // Sprawdzamy, czy handler zadziałał
                 .andExpect(jsonPath("$.message", is("Project not found with id : '99'")));
     }
 
