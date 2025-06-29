@@ -62,7 +62,7 @@ class ProjectControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser // Symuluje zalogowanego użytkownika z domyślną rolą USER
+    @WithMockUser
     void listProjects_shouldReturnProjectsListView() throws Exception {
         List<ProjectDTO> projects = Collections.singletonList(testProjectDTO);
         when(projectService.getProjectsForCurrentUser()).thenReturn(projects);
@@ -92,7 +92,7 @@ class ProjectControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(roles = "EMPLOYEE") // Użytkownik bez uprawnień
+    @WithMockUser(roles = "EMPLOYEE")
     void showCreateProjectForm_asEmployee_shouldBeForbidden() throws Exception {
         mockMvc.perform(get("/projects/new"))
                 .andExpect(status().isForbidden());
@@ -108,7 +108,7 @@ class ProjectControllerTest {
         when(projectService.createProject(any(CreateProjectRequest.class))).thenReturn(testProjectDTO);
 
         mockMvc.perform(post("/projects")
-                        .with(csrf()) // Wymagane przy włączonym CSRF
+                        .with(csrf())
                         .param("name", "New Valid Project")
                         .param("description", "A description"))
                 .andExpect(status().is3xxRedirection())
@@ -122,7 +122,6 @@ class ProjectControllerTest {
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void createProject_withInvalidData_shouldReturnFormView() throws Exception {
-        // Nazwa jest pusta, co narusza walidację @NotBlank
         mockMvc.perform(post("/projects")
                         .with(csrf())
                         .param("name", "")
@@ -152,10 +151,9 @@ class ProjectControllerTest {
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void getProjectById_whenNotFound_shouldReturn404AndErrorMessage() throws Exception {
-        // Symulujemy rzucenie wyjątku przez serwis
         when(projectService.getProjectById(99L)).thenThrow(new ResourceNotFoundException("Project", "id", 99L));
 
-        mockMvc.perform(get("/projects/edit/99")) // Wywołujemy endpoint, który używa tej metody
+        mockMvc.perform(get("/projects/edit/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.message", is("Project not found with id : '99'")));
@@ -168,9 +166,8 @@ class ProjectControllerTest {
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void createProject_withInvalidData_shouldTriggerValidation() throws Exception {
-        // Wysyłamy żądanie z pustą nazwą, co narusza @NotBlank
         mockMvc.perform(post("/projects").with(csrf())
-                        .param("name", "") // Puste pole
+                        .param("name", "")
                         .param("description", "A description"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("projects/form"))
@@ -184,14 +181,12 @@ class ProjectControllerTest {
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void getProjectById_whenNotFound_shouldTriggerExceptionHandler() throws Exception {
-        // Symulujemy rzucenie wyjątku przez serwis
         when(projectService.getProjectById(99L)).thenThrow(new ResourceNotFoundException("Project", "id", 99L));
 
-        // Testujemy endpoint, który używa tej metody
-        // Oczekujemy, że GlobalExceptionHandler przechwyci błąd i zwróci odpowiedź JSON
+
         mockMvc.perform(get("/projects/edit/99"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType("application/json")) // Sprawdzamy, czy handler zadziałał
+                .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message", is("Project not found with id : '99'")));
     }
 

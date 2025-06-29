@@ -72,7 +72,7 @@ public class AccountController {
         } else {
             TwoFactorSetupDto twoFactorSetupDto = userService.setupTwoFactorAuthentication(username);
             model.addAttribute("twoFactorSetup", twoFactorSetupDto);
-            model.addAttribute("verifyCodeDto", verifyCodeDto); // Zachowaj wpisany kod
+            model.addAttribute("verifyCodeDto", verifyCodeDto);
             model.addAttribute("twoFactorError", "Nieprawidłowy kod weryfikacyjny.");
             return "account/settings";
         }

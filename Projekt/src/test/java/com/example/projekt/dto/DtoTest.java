@@ -1,7 +1,7 @@
 package com.example.projekt.dto;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning; // Upewnij się, że ten import istnieje
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 

@@ -418,7 +418,6 @@ class UserServiceTest {
 
     @Test
     void deleteUserById_cannotDeleteSelf_throwsException() {
-        // Ustaw, że zalogowany użytkownik to ten, którego próbujemy usunąć
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn(testUser.getUsername());
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -427,7 +426,6 @@ class UserServiceTest {
 
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
-        // Asercja
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             userService.deleteUserById(testUser.getId());
         });

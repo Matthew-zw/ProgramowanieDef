@@ -1,7 +1,7 @@
 package com.example.projekt.Entity;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning; // Upewnij się, że ten import jest
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +25,7 @@ class UserTest {
         user1 = new User("testuser", "password", "Test User", "test@example.com");
         user1.setId(1L);
         user2 = new User("testuser", "password2", "Test User Two", "test2@example.com");
-        user2.setId(2L); // Inne ID, ale ta sama nazwa użytkownika
+        user2.setId(2L);
 
         roleAdmin = new Role("ROLE_ADMIN");
         roleAdmin.setId(10L);

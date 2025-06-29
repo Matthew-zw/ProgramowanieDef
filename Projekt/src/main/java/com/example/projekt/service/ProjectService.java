@@ -168,7 +168,7 @@ public class ProjectService {
      */
     @Transactional
     public void assignUsersToProject(Long projectId, Set<Long> userIdsToAssign) {
-        Project project = findProjectEntityyById(projectId); // Pobierz projekt
+        Project project = findProjectEntityyById(projectId);
         Set<User> currentUsers = new HashSet<>(project.getAssignedUsers());
         for (User user : currentUsers) {
             if (!userIdsToAssign.contains(user.getId())) {

@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleUserAlreadyExistException(UserAlreadyExistAuthenticationException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value()); // 409 Conflict
+        body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "User Already Exists");
         body.put("message", ex.getMessage());
         body.put("path", request.getDescription(false).replace("uri=", ""));

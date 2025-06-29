@@ -102,7 +102,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/projects/delete/**").hasRole("PROJECT_MANAGER")
                         .requestMatchers("/projects/tasks/new").hasAnyRole("PROJECT_MANAGER", "EMPLOYEE")
                         .requestMatchers("/projects/tasks/edit/**").hasAnyRole("PROJECT_MANAGER", "EMPLOYEE")
-                        .requestMatchers("/account/**").authenticated() // Sprawdź, czy ta linia nie jest duplikatem, ani nie ma konfliktu
+                        .requestMatchers("/account/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin

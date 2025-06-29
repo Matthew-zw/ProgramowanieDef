@@ -411,7 +411,6 @@ class ProjectServiceTest {
 
     @Test
     void getProjectsForCurrentUser_unauthenticatedUser_returnsEmptyList() {
-        // Symulujemy brak zalogowanego użytkownika
         when(securityContext.getAuthentication()).thenReturn(null);
 
         List<ProjectDTO> projects = projectService.getProjectsForCurrentUser();

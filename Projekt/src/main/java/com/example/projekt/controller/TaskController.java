@@ -3,12 +3,11 @@ package com.example.projekt.controller;
 import com.example.projekt.dto.CreateTaskRequest;
 import com.example.projekt.dto.TaskDTO;
 import com.example.projekt.dto.UpdateTaskRequest;
-import com.example.projekt.Entity.TaskStatus; // For dropdown
+import com.example.projekt.Entity.TaskStatus;
 import com.example.projekt.service.ProjectService;
 import com.example.projekt.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,7 +48,7 @@ public class TaskController {
         model.addAttribute("createTaskRequest", new CreateTaskRequest());
         model.addAttribute("projectId", projectId);
         model.addAttribute("project", projectService.getProjectById(projectId));
-        model.addAttribute("taskStatuses", TaskStatus.values()); // For status dropdown
+        model.addAttribute("taskStatuses", TaskStatus.values());
         return "tasks/form";
     }
 

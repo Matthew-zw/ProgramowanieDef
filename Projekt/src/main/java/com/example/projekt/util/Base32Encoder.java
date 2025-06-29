@@ -36,8 +36,6 @@ public class Base32Encoder {
             base32.append(ALPHABET.charAt(digit));
         }
 
-        // Twoja oryginalna implementacja nie miała paddingu, co jest OK dla TOTP.
-        // Zostawiamy to tak, jak było.
 
         return base32.toString();
     }
@@ -48,8 +46,6 @@ public class Base32Encoder {
             return new byte[0];
         }
 
-        // Twoja implementacja `replaceAll` była głównym źródłem problemów.
-        // Usuwamy ją i zastępujemy pętlą, która buduje czysty ciąg.
         StringBuilder cleanDataBuilder = new StringBuilder();
         for (char c : data.toUpperCase().toCharArray()) {
             if (ALPHABET.indexOf(c) != -1) {
