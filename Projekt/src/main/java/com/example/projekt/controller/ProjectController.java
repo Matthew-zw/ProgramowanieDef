@@ -17,14 +17,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/projects")
 @RequiredArgsConstructor
 
 public class ProjectController {
+
     private final ProjectService projectService;
 
-
+    /**
+     *
+     * @param model
+     * @return
+     */
     @GetMapping("/new")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String showCreateProjectForm(Model model) {
@@ -32,6 +38,13 @@ public class ProjectController {
         return "projects/form";
     }
 
+    /**
+     *
+     * @param request
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String createProject(@Valid @ModelAttribute("createProjectRequest") CreateProjectRequest request,
@@ -42,6 +55,13 @@ public class ProjectController {
         projectService.createProject(request);
         return "redirect:/projects";
     }
+
+    /**
+     *
+     * @param projectId
+     * @param model
+     * @return
+     */
     @GetMapping("/edit/{projectId}")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String showUpdateProjectForm(@PathVariable Long projectId, Model model) {
@@ -56,6 +76,15 @@ public class ProjectController {
         model.addAttribute("projectId", projectId);
         return "projects/edit-form";
     }
+
+    /**
+     *
+     * @param projectId
+     * @param request
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping("/update/{projectId}")
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     public String updateProject(@PathVariable Long projectId,
@@ -69,12 +98,24 @@ public class ProjectController {
         return "redirect:/projects";
     }
 
+    /**
+     *
+     * @param projectId
+     * @return
+     */
     @PreAuthorize("hasRole('ROLE_PROJECT_MANAGER')")
     @PostMapping("/delete/{projectId}")
     public String deleteProject(@PathVariable Long projectId) {
         projectService.deleteProject(projectId);
         return "redirect:/projects";
     }
+
+    /**
+     *
+     * @param projectId
+     * @param model
+     * @return
+     */
     @GetMapping("/assign-users/{projectId}")
     @PreAuthorize("hasAuthority('ROLE_PROJECT_MANAGER')")
     public String showAssignUsersForm(@PathVariable Long projectId, Model model) {
@@ -92,7 +133,12 @@ public class ProjectController {
         return "projects/assign-users-form";
     }
 
-
+    /**
+     *
+     * @param dto
+     * @param redirectAttributes
+     * @return
+     */
     @PostMapping("/assign-users")
     @PreAuthorize("hasAuthority('ROLE_PROJECT_MANAGER')")
     public String processAssignUsers(@ModelAttribute("assignUsersDto") AssignUsersToProjectDto dto,
@@ -105,6 +151,12 @@ public class ProjectController {
         }
         return "redirect:/projects";
     }
+
+    /**
+     *
+     * @param model
+     * @return
+     */
     @GetMapping
     public String listProjects(Model model) {
         model.addAttribute("projects", projectService.getProjectsForCurrentUser());

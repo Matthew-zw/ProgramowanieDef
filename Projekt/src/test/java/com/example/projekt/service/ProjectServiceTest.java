@@ -97,6 +97,11 @@ class ProjectServiceTest {
         lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
     }
 
+    /**
+     *
+     * @param username
+     * @param roles
+     */
     private void mockAuthentication(String username, String... roles) {
         List<SimpleGrantedAuthority> authorities = Arrays.stream(roles)
                 .map(SimpleGrantedAuthority::new)

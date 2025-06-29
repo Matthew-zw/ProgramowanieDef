@@ -43,6 +43,10 @@ class CustomAuthenticationSuccessHandlerTest {
         response = new MockHttpServletResponse();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void onAuthenticationSuccess_forAdmin_redirectsToAdminUsers() throws Exception {
         when(authentication.getName()).thenReturn("admin");
@@ -59,6 +63,10 @@ class CustomAuthenticationSuccessHandlerTest {
         assertEquals("/admin/users", response.getRedirectedUrl());
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void onAuthenticationSuccess_forUser_redirectsToProjects() throws Exception {
         when(authentication.getName()).thenReturn("user");
@@ -75,6 +83,10 @@ class CustomAuthenticationSuccessHandlerTest {
         assertEquals("/projects", response.getRedirectedUrl());
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void onAuthenticationSuccess_with2FAEnabled_redirectsToVerify2fa() throws Exception {
         when(authentication.getName()).thenReturn("user2fa");

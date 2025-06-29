@@ -22,13 +22,21 @@ import java.util.HashSet;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProjectService {
+
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
+    /**
+     *
+     * @param project
+     * @return
+     */
     private ProjectDTO maptoProjectDTO(Project project) {
         ProjectDTO dto = new ProjectDTO();
         dto.setId(project.getId());
@@ -38,6 +46,12 @@ public class ProjectService {
         dto.setEndDate(project.getEndDate());
         return dto;
     }
+
+    /**
+     *
+     * @param user
+     * @return
+     */
     private UserDTO mapToUserDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
@@ -45,6 +59,12 @@ public class ProjectService {
         dto.setFullName(user.getFullName());
         return dto;
     }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
     public ProjectDTO createProject(CreateProjectRequest request){
         Project project = new Project();
         project.setName(request.getName());
@@ -74,19 +94,42 @@ public class ProjectService {
         Project savedProject = projectRepository.save(project);
         return maptoProjectDTO(savedProject);
     }
+
+    /**
+     *
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<ProjectDTO> getAllProjects(){
         return projectRepository.findAll().stream().map(this::maptoProjectDTO).collect(Collectors.toList());
     }
+
+    /**
+     *
+     * @param projectId
+     * @return
+     */
     @Transactional(readOnly = true)
     public ProjectDTO getProjectById(Long projectId){
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project","id",projectId));
         return maptoProjectDTO(project);
     }
+
+    /**
+     *
+     * @param projectId
+     * @return
+     */
     protected Project findProjectEntityyById(Long projectId){
         return projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException("Project","id",projectId));
     }
 
+    /**
+     *
+     * @param projectId
+     * @param request
+     * @return
+     */
     public ProjectDTO updateProject(Long projectId, UpdateProjectRequest request){
         Project project = findProjectEntityyById(projectId);
 
@@ -98,16 +141,31 @@ public class ProjectService {
         return maptoProjectDTO(updatedProject);
     }
 
+    /**
+     *
+     * @param projectId
+     */
     public void deleteProject(Long projectId){
         Project project = findProjectEntityyById(projectId);
         projectRepository.delete(project);
     }
+
+    /**
+     *
+     * @param projectId
+     * @return
+     */
     @Transactional(readOnly = true)
     public Project findProjectEntityWithUsersById(Long projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
     }
 
+    /**
+     *
+     * @param projectId
+     * @param userIdsToAssign
+     */
     @Transactional
     public void assignUsersToProject(Long projectId, Set<Long> userIdsToAssign) {
         Project project = findProjectEntityyById(projectId); // Pobierz projekt
@@ -129,6 +187,11 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    /**
+     *
+     * @param projectId
+     * @return
+     */
     @Transactional(readOnly = true)
     public Set<UserDTO> getAssignedUsersForProject(Long projectId) {
         Project project = findProjectEntityyById(projectId);
@@ -137,6 +200,10 @@ public class ProjectService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     *
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<UserDTO> getAllUsersAvailableForAssignment() {
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
@@ -149,6 +216,11 @@ public class ProjectService {
                 .map(this::mapToUserDTO)
                 .collect(Collectors.toList());
     }
+
+    /**
+     *
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<ProjectDTO> getProjectsForCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

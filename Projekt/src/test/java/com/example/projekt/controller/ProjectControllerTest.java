@@ -57,6 +57,10 @@ class ProjectControllerTest {
         testProjectDTO.setName("Test Project");
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser // Symuluje zalogowanego użytkownika z domyślną rolą USER
     void listProjects_shouldReturnProjectsListView() throws Exception {
@@ -70,6 +74,10 @@ class ProjectControllerTest {
                 .andExpect(model().attribute("projects", projects));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void showCreateProjectForm_asManager_shouldReturnFormView() throws Exception {
@@ -79,6 +87,10 @@ class ProjectControllerTest {
                 .andExpect(model().attributeExists("createProjectRequest"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "EMPLOYEE") // Użytkownik bez uprawnień
     void showCreateProjectForm_asEmployee_shouldBeForbidden() throws Exception {
@@ -86,6 +98,10 @@ class ProjectControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void createProject_withValidData_shouldRedirectToProjectsList() throws Exception {
@@ -99,6 +115,10 @@ class ProjectControllerTest {
                 .andExpect(redirectedUrl("/projects"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void createProject_withInvalidData_shouldReturnFormView() throws Exception {
@@ -112,6 +132,10 @@ class ProjectControllerTest {
                 .andExpect(model().attributeHasFieldErrors("createProjectRequest", "name"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void deleteProject_asManager_shouldRedirect() throws Exception {
@@ -121,6 +145,10 @@ class ProjectControllerTest {
                 .andExpect(redirectedUrl("/projects"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void getProjectById_whenNotFound_shouldReturn404AndErrorMessage() throws Exception {
@@ -133,6 +161,10 @@ class ProjectControllerTest {
                 .andExpect(jsonPath("$.message", is("Project not found with id : '99'")));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void createProject_withInvalidData_shouldTriggerValidation() throws Exception {
@@ -145,6 +177,10 @@ class ProjectControllerTest {
                 .andExpect(model().attributeHasFieldErrors("createProjectRequest", "name"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "PROJECT_MANAGER")
     void getProjectById_whenNotFound_shouldTriggerExceptionHandler() throws Exception {

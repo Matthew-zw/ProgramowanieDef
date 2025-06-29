@@ -1,6 +1,7 @@
 package com.example.projekt.dto;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+
 @Data
 public final class UserRegistrationDto {
 
@@ -24,7 +25,12 @@ public final class UserRegistrationDto {
     @Size(max = 100, message = "Adres email nie może przekraczać 100 znaków.")
     private String email;
 
-    // Walidator na poziomie klasy, aby sprawdzić, czy hasła się zgadzają
+
+
+    /**
+     *
+     * @return
+     */
     @AssertTrue(message = "Hasła muszą być takie same.")
     public boolean isPasswordConfirmed() {
         return password != null && password.equals(confirmPassword);

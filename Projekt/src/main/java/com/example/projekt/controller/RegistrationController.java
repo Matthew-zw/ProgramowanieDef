@@ -23,16 +23,32 @@ public class RegistrationController {
 
     private final UserService userService;
 
+    /**
+     *
+     * @return
+     */
     @ModelAttribute("userRegistrationDto")
     public UserRegistrationDto userRegistrationDto() {
         return new UserRegistrationDto();
     }
 
+    /**
+     *
+     * @param model
+     * @return
+     */
     @GetMapping
     public String showRegistrationForm(Model model) {
         return "register";
     }
 
+    /**
+     *
+     * @param registrationDto
+     * @param result
+     * @param redirectAttributes
+     * @return
+     */
     @PostMapping
     public String registerUserAccount(@Valid @ModelAttribute("userRegistrationDto") UserRegistrationDto registrationDto,
                                       BindingResult result,

@@ -24,6 +24,12 @@ public class AccountController {
 
     private final UserService userService;
 
+    /**
+     *
+     * @param model
+     * @param authentication
+     * @return
+     */
     @GetMapping("/settings")
     public String showAccountSettings(Model model, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -36,6 +42,15 @@ public class AccountController {
         return "account/settings";
     }
 
+    /**
+     *
+     * @param verifyCodeDto
+     * @param result
+     * @param authentication
+     * @param redirectAttributes
+     * @param model
+     * @return
+     */
     @PostMapping("/enable-2fa")
     public String enableTwoFactor(@ModelAttribute("verifyCodeDto") @Valid VerifyTotpCodeDto verifyCodeDto,
                                   BindingResult result,
@@ -64,6 +79,12 @@ public class AccountController {
         return "redirect:/account/settings";
     }
 
+    /**
+     *
+     * @param authentication
+     * @param redirectAttributes
+     * @return
+     */
     @PostMapping("/disable-2fa")
     public String disableTwoFactor(Authentication authentication, RedirectAttributes redirectAttributes) {
         if (authentication == null || !authentication.isAuthenticated()) {

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class User implements UserDetails, Serializable {
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -53,8 +54,16 @@ public class User implements UserDetails, Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+
     private Set<Role> roles = new HashSet<>();
 
+    /**
+     *
+     * @param username
+     * @param password
+     * @param fullName
+     * @param email
+     */
     public User(String username, String password, String fullName, String email) {
         this.username = username;
         this.password = password;
@@ -62,15 +71,28 @@ public class User implements UserDetails, Serializable {
         this.email = email;
     }
 
+    /**
+     *
+     * @param role
+     */
     public void addRole(Role role) {
         this.roles.add(role);
         role.getUsers().add(this);
     }
 
+    /**
+     *
+     * @param role
+     */
     public void removeRole(Role role) {
         this.roles.remove(role);
         role.getUsers().remove(this);
     }
+
+    /**
+     *
+     * @return
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
@@ -78,36 +100,65 @@ public class User implements UserDetails, Serializable {
                 .collect(Collectors.toList());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getPassword() {
         return password;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getUsername() {
         return username;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     *
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,10 +166,15 @@ public class User implements UserDetails, Serializable {
         return username != null ? username.equals(user.username) : user.username == null;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int hashCode() {
         return username != null ? username.hashCode() : 0;
     }
+
     @ManyToMany(mappedBy = "assignedUsers", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

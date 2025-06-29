@@ -26,13 +26,21 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler; // Zmieniono na 'final'
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
+    /**
+     *
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     *
+     * @return
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -41,11 +49,21 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     *
+     * @param authConfig
+     * @return
+     * @throws Exception
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     *
+     * @return
+     */
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
@@ -54,6 +72,10 @@ public class SecurityConfig {
         return roleHierarchy;
     }
 
+    /**
+     *
+     * @return
+     */
     @Bean
     public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
@@ -61,6 +83,12 @@ public class SecurityConfig {
         return expressionHandler;
     }
 
+    /**
+     *
+     * @param http
+     * @return
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

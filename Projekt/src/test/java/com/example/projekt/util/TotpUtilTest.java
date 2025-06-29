@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TotpUtilTest {
 
-    private static final String TEST_SECRET = "JBSWY3DPEHPK3PXP"; // "Hello"
+    private static final String TEST_SECRET = "JBSWY3DPEHPK3PXP";
 
     @Test
     void testGenerateSecret() {
@@ -16,7 +16,7 @@ class TotpUtilTest {
 
     @Test
     void testGenerateCodeIsDeterministic() {
-        long fixedTimeStep = 59L; // Z RFC 4226
+        long fixedTimeStep = 59L;
         String expectedCode = "663767";
         String generatedCode = TotpUtil.generateCode(TEST_SECRET, fixedTimeStep);
         assertEquals(expectedCode, generatedCode);

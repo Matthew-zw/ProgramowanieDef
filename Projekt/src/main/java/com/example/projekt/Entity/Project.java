@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 @Entity
 @Table(name = "projects")
 @Data
 @NoArgsConstructor
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,21 +49,37 @@ public class Project {
     @EqualsAndHashCode.Exclude
     private Set<User> assignedUsers = new HashSet<>();
 
+    /**
+     *
+     * @param task
+     */
     public void addTask(Task task){
         tasks.add(task);
         task.setProject(this);
     }
 
+    /**
+     *
+     * @param task
+     */
     public void removeTask(Task task){
         tasks.remove(task);
         task.setProject(null);
     }
 
-
+    /**
+     *
+     * @param user
+     */
     public void assignUser(User user) {
         this.assignedUsers.add(user);
         user.getProjects().add(this);
     }
+
+    /**
+     *
+     * @param user
+     */
     public void unassignUser(User user) {
         this.assignedUsers.remove(user);
         user.getProjects().remove(this);

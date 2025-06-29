@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,6 +41,11 @@ public class Task {
         updatedAt = LocalDateTime.now();
     }
 
+    /**
+     *
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -47,6 +53,10 @@ public class Task {
         return id != null && id.equals(task.id);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int hashCode() {
         return getClass().hashCode();

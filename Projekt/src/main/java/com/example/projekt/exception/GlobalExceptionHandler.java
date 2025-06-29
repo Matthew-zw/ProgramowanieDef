@@ -13,6 +13,12 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    /**
+     *
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request){
         Map<String,Object> body = new HashMap<>();
@@ -23,6 +29,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     *
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex, WebRequest request){
         Map<String,String> errors = new HashMap<>();
@@ -40,6 +52,13 @@ public class GlobalExceptionHandler {
         body.put("path", request.getDescription(false).replace("uri",""));
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    /**
+     *
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request){
         Map<String,Object> body = new HashMap<>();
@@ -50,6 +69,13 @@ public class GlobalExceptionHandler {
         body.put("path", request.getDescription(false).replace("uri",""));
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     *
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(UserAlreadyExistAuthenticationException.class)
     public ResponseEntity<?> handleUserAlreadyExistException(UserAlreadyExistAuthenticationException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();

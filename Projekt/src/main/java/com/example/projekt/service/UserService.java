@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import com.example.projekt.dto.TwoFactorSetupDto;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -28,6 +29,12 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     *
+     * @param registrationDto
+     * @return
+     * @throws UserAlreadyExistAuthenticationException
+     */
     @Transactional
     public User registerNewUser(UserRegistrationDto registrationDto) throws UserAlreadyExistAuthenticationException {
         if (userRepository.findByUsername(registrationDto.getUsername()).isPresent()) {
@@ -51,30 +58,59 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     */
     public boolean usernameExists(String username) {
         return userRepository.findByUsername(username).isPresent();
     }
 
+    /**
+     *
+     * @param email
+     * @return
+     */
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
+
+    /**
+     *
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
     @Transactional(readOnly = true)
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
+    /**
+     *
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<Role> findAllRoles() {
         return roleRepository.findAll();
     }
 
-
+    /**
+     *
+     * @param userId
+     * @param roleIds
+     * @return
+     */
     @Transactional
     public User updateUserRoles(Long userId, Set<Long> roleIds) {
         User user = findUserById(userId);
@@ -86,6 +122,12 @@ public class UserService {
         user.setRoles(newRoles);
         return userRepository.save(user);
     }
+
+    /**
+     *
+     * @param username
+     * @return
+     */
     @Transactional
     public TwoFactorSetupDto setupTwoFactorAuthentication(String username) {
         User user = userRepository.findByUsername(username)
@@ -108,6 +150,12 @@ public class UserService {
         return dto;
     }
 
+    /**
+     *
+     * @param username
+     * @param code
+     * @return
+     */
     @Transactional
     public boolean enableTwoFactorAuthentication(String username, String code) {
         User user = userRepository.findByUsername(username)
@@ -125,6 +173,10 @@ public class UserService {
         return false;
     }
 
+    /**
+     *
+     * @param username
+     */
     @Transactional
     public void disableTwoFactorAuthentication(String username) {
         User user = userRepository.findByUsername(username)
@@ -133,12 +185,24 @@ public class UserService {
         user.setTwoFactorSecret(null);
         userRepository.save(user);
     }
+
+    /**
+     *
+     * @param username
+     * @return
+     */
     public boolean isTwoFactorEnabledForUser(String username) {
         return userRepository.findByUsername(username)
                 .map(User::isTwoFactorEnabled)
                 .orElse(false);
     }
 
+    /**
+     *
+     * @param username
+     * @param code
+     * @return
+     */
     public boolean verifyTotpCodeForUser(String username, String code) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
@@ -147,6 +211,11 @@ public class UserService {
         }
         return TotpUtil.verifyCode(user.getTwoFactorSecret(), code);
     }
+
+    /**
+     *
+     * @param userId
+     */
     @Transactional
     public void deleteUserById(Long userId) {
         User userToDelete = userRepository.findById(userId)
@@ -155,12 +224,7 @@ public class UserService {
         if (authentication != null && authentication.getName().equals(userToDelete.getUsername())) {
             throw new IllegalArgumentException("Nie możesz usunąć własnego konta.");
         }
-
-        // Można dodać logikę sprawdzania, czy to nie jest np. jedyne konto z rolą ADMIN
-        // if (userToDelete.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")) &&
-        //     userRepository.findAll().stream().filter(u -> u.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"))).count() <= 1) {
-        //     throw new IllegalStateException("Nie można usunąć ostatniego konta administratora.");
-        // }
+        
 
         userRepository.delete(userToDelete);
     }

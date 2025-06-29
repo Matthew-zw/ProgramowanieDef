@@ -20,6 +20,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final UserRepository userRepository;
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @param authentication
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -27,13 +35,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String username = authentication.getName();
         User user = userRepository.findByUsername(username).orElse(null);
 
-        // Najpierw sprawdzamy, czy użytkownik (niezależnie od roli) ma włączone 2FA
         if (user != null && user.isTwoFactorEnabled()) {
             HttpSession session = request.getSession();
             session.setAttribute("TEMP_AUTHENTICATED_USER", username);
             response.sendRedirect(request.getContextPath() + "/verify-2fa");
         } else {
-            // Jeśli 2FA nie jest włączone, wtedy decydujemy na podstawie roli
+
             boolean isAdmin = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .anyMatch(role -> role.equals("ROLE_ADMIN"));

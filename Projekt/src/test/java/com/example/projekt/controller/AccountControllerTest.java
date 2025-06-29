@@ -36,6 +36,10 @@ class AccountControllerTest {
     @MockBean
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(username = "testuser")
     void showAccountSettings_shouldReturnSettingsView() throws Exception {
@@ -49,6 +53,10 @@ class AccountControllerTest {
                 .andExpect(model().attributeExists("twoFactorSetup", "verifyCodeDto"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void showAccountSettings_unauthenticated_shouldRedirectToLogin() throws Exception {
         mockMvc.perform(get("/account/settings"))
@@ -56,6 +64,10 @@ class AccountControllerTest {
                 .andExpect(redirectedUrl("http://localhost/login"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(username = "testuser")
     void disableTwoFactor_shouldRedirectToSettings() throws Exception {
@@ -65,6 +77,10 @@ class AccountControllerTest {
                 .andExpect(flash().attributeExists("successMessage"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(username = "testuser")
     void enableTwoFactor_withValidCode_shouldRedirectAndShowSuccess() throws Exception {
@@ -77,6 +93,10 @@ class AccountControllerTest {
                 .andExpect(flash().attributeExists("successMessage"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(username = "testuser")
     void enableTwoFactor_withInvalidCode_shouldReturnViewWithError() throws Exception {

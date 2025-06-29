@@ -89,13 +89,11 @@ class UserTest {
 
     @Test
     void equalsAndHashCode_verify() {
-        // Prefab dla relacji z Role
         Role r1 = new Role("ROLE_ONE");
         r1.setId(1L);
         Role r2 = new Role("ROLE_TWO");
         r2.setId(2L);
 
-        // --- POPRAWKA: Dodaj prefab dla relacji z Project ---
         Project p1 = new Project();
         p1.setId(101L);
         Project p2 = new Project();
@@ -103,8 +101,8 @@ class UserTest {
 
         EqualsVerifier.forClass(User.class)
                 .suppress(Warning.NONFINAL_FIELDS)
-                .withPrefabValues(Role.class, r1, r2) // Istniejąca poprawka
-                .withPrefabValues(Project.class, p1, p2) // NOWA poprawka
+                .withPrefabValues(Role.class, r1, r2)
+                .withPrefabValues(Project.class, p1, p2)
                 .withIgnoredFields("id", "password", "fullName", "email", "enabled", "twoFactorSecret", "twoFactorEnabled", "roles", "projects", "serialVersionUID")
                 .verify();
     }

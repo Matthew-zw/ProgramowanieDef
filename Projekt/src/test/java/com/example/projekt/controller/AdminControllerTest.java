@@ -36,6 +36,10 @@ class AdminControllerTest {
     @MockBean
     private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "ADMIN")
     void listUsers_asAdmin_shouldReturnUsersList() throws Exception {
@@ -47,6 +51,10 @@ class AdminControllerTest {
                 .andExpect(model().attributeExists("users"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void listUsers_asEmployee_shouldBeForbidden() throws Exception {
@@ -54,6 +62,10 @@ class AdminControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteUser_asAdmin_shouldRedirect() throws Exception {

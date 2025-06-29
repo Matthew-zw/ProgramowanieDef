@@ -10,14 +10,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// --- KLUCZOWA ZMIANA: Wyłączamy auto-konfigurację security w nowoczesny sposób ---
 @WebMvcTest(controllers = WebController.class,
         excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+
 class WebControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void index_shouldReturnLoginView() throws Exception {
         mockMvc.perform(get("/"))
@@ -25,6 +29,10 @@ class WebControllerTest {
                 .andExpect(view().name("/login"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void loginPage_withError_shouldAddLoginErrorAttribute() throws Exception {
         mockMvc.perform(get("/login").param("error", "true"))
@@ -33,6 +41,10 @@ class WebControllerTest {
                 .andExpect(model().attributeExists("loginError"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void loginPage_withLogout_shouldAddLogoutMessageAttribute() throws Exception {
         mockMvc.perform(get("/login").param("logout", "true"))
@@ -41,6 +53,10 @@ class WebControllerTest {
                 .andExpect(model().attributeExists("logoutMessage"));
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     void loginPage_withNoParams_shouldNotAddAttributes() throws Exception {
         mockMvc.perform(get("/login"))

@@ -19,8 +19,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class TaskService {
+
     private final TaskRepository taskRepository;
     private final ProjectService projectService;
+
+    /**
+     *
+     * @param task
+     * @return
+     */
     private TaskDTO mapToTaskDTO(Task task){
         TaskDTO dto = new TaskDTO();
         dto.setId(task.getId());
@@ -35,6 +42,13 @@ public class TaskService {
         }
         return dto;
     }
+
+    /**
+     *
+     * @param projectId
+     * @param request
+     * @return
+     */
     public TaskDTO createTask(Long projectId, CreateTaskRequest request){
         Project project = projectService.findProjectEntityyById(projectId);
         Task task = new Task();
@@ -46,20 +60,45 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
         return mapToTaskDTO(savedTask);
     }
+
+    /**
+     *
+     * @param projectId
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<TaskDTO> getTasksByProjectId(Long projectId){
         projectService.findProjectEntityyById(projectId);
         List<Task> tasks = taskRepository.findByProjectId(projectId);
         return tasks.stream().map(this::mapToTaskDTO).collect(Collectors.toList());
     }
+
+    /**
+     *
+     * @param taskId
+     * @return
+     */
     @Transactional(readOnly = true)
     public TaskDTO getTaskById(Long taskId){
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task", "id", taskId));
         return mapToTaskDTO(task);
     }
+
+    /**
+     *
+     * @param taskId
+     * @return
+     */
     private Task findTaskEntityById(Long taskId){
         return taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotFoundException("Task","id",taskId));
     }
+
+    /**
+     *
+     * @param taskId
+     * @param request
+     * @return
+     */
     public TaskDTO updateTask(Long taskId, UpdateTaskRequest request){
         Task task = findTaskEntityById(taskId);
         task.setTitle(request.getTitle());
@@ -69,6 +108,11 @@ public class TaskService {
         Task updatedTask = taskRepository.save(task);
         return mapToTaskDTO(updatedTask);
     }
+
+    /**
+     *
+     * @param taskId
+     */
     public void deleteTask(Long taskId){
         Task task = findTaskEntityById(taskId);
         taskRepository.delete(task);

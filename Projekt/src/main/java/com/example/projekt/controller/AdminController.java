@@ -23,11 +23,24 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final UserService userService;
+
+    /**
+     *
+     * @param model
+     * @return
+     */
     @GetMapping("/users")
     public String listUsers(Model model) {
         model.addAttribute("users", userService.findAllUsers());
         return "admin/users-list";
     }
+
+    /**
+     *
+     * @param userId
+     * @param model
+     * @return
+     */
     @GetMapping("/users/edit-roles/{userId}")
     public String showEditUserRolesForm(@PathVariable Long userId, Model model) {
         User user = userService.findUserById(userId);
@@ -42,6 +55,15 @@ public class AdminController {
         model.addAttribute("allRoles", allRoles);
         return "admin/user-edit-roles";
     }
+
+    /**
+     *
+     * @param userRoleUpdateDto
+     * @param result
+     * @param redirectAttributes
+     * @param model
+     * @return
+     */
     @PostMapping("/users/update-roles")
     public String updateUserRoles(@Valid @ModelAttribute("userRoleUpdateDto") UserRoleUpdateDto userRoleUpdateDto,
                                   BindingResult result,
@@ -61,6 +83,13 @@ public class AdminController {
         }
         return "redirect:/admin/users";
     }
+
+    /**
+     *
+     * @param userId
+     * @param redirectAttributes
+     * @return
+     */
     @PostMapping("/users/delete/{userId}")
     public String deleteUser(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
         try {

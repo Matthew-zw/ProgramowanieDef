@@ -9,14 +9,13 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@ActiveProfiles("test") // Użyj osobnego profilu, jeśli masz konfigurację testową
+@ActiveProfiles("test")
 class DataInitializerTest {
 
     @Autowired
     private UserRepository userRepository;
 
-    // Ten test uruchamia całą aplikację i sprawdza, czy DataInitializer
-    // poprawnie dodał użytkowników do bazy danych.
+
     @Test
     void run_shouldInitializeDefaultUsers() {
         assertTrue(userRepository.findByUsername("admin").isPresent());

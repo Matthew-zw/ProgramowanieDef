@@ -4,11 +4,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning; // Upewnij się, że ten import istnieje
 import org.junit.jupiter.api.Test;
 
-// Ta klasa testuje wszystkie obiekty DTO.
-class DtoTest {
 
-    // POPRAWKA: Dodajemy .suppress(Warning.NONFINAL_FIELDS) do każdego testu,
-    // aby wyłączyć sprawdzanie, czy klasa jest finalna, co jest wymagane dla klas z @Data.
+class DtoTest {
 
     @Test
     void testAssignUsersToProjectDto() {

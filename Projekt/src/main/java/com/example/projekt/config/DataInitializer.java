@@ -22,6 +22,11 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
     @Override
     @Transactional
     public void run(String... args) throws Exception {
@@ -33,10 +38,24 @@ public class DataInitializer implements CommandLineRunner {
         createUserIfNotFound("user", "user123", "User", "user@example.com", Set.of("ROLE_EMPLOYEE"));
     }
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     private Role createRoleIfNotFound(String name) {
         return roleRepository.findByName(name)
                 .orElseGet(() -> roleRepository.save(new Role(name)));
     }
+
+    /**
+     *
+     * @param username
+     * @param password
+     * @param fullName
+     * @param email
+     * @param roleNames
+     */
     private void createUserIfNotFound(String username, String password, String fullName, String email, Set<String> roleNames) {
         if (userRepository.findByUsername(username).isEmpty()) {
             User user = new User();

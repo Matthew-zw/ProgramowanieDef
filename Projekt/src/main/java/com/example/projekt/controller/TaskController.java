@@ -22,6 +22,13 @@ import java.util.List;
 public class TaskController {
     private final TaskService taskService;
     private final ProjectService projectService;
+
+    /**
+     *
+     * @param projectId
+     * @param model
+     * @return
+     */
     @GetMapping
     public String getTasksByProject(@PathVariable Long projectId, Model model) {
         List<TaskDTO> tasks = taskService.getTasksByProjectId(projectId);
@@ -30,6 +37,13 @@ public class TaskController {
         model.addAttribute("projectId", projectId);
         return "tasks/list";
     }
+
+    /**
+     *
+     * @param projectId
+     * @param model
+     * @return
+     */
     @GetMapping("/new")
     public String showCreateTaskForm(@PathVariable Long projectId, Model model) {
         model.addAttribute("createTaskRequest", new CreateTaskRequest());
@@ -39,6 +53,14 @@ public class TaskController {
         return "tasks/form";
     }
 
+    /**
+     *
+     * @param projectId
+     * @param request
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping
     public String createTask(@PathVariable Long projectId,
                              @Valid @ModelAttribute("createTaskRequest") CreateTaskRequest request,
@@ -53,6 +75,13 @@ public class TaskController {
         return "redirect:/projects/" + projectId + "/tasks";
     }
 
+    /**
+     *
+     * @param projectId
+     * @param taskId
+     * @param model
+     * @return
+     */
     @GetMapping("/edit/{taskId}")
     public String showUpdateTaskForm(@PathVariable Long projectId, @PathVariable Long taskId, Model model) {
         TaskDTO taskDTO = taskService.getTaskById(taskId);
@@ -69,6 +98,16 @@ public class TaskController {
         model.addAttribute("taskStatuses", TaskStatus.values());
         return "tasks/edit-form";
     }
+
+    /**
+     *
+     * @param projectId
+     * @param taskId
+     * @param request
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping("/update/{taskId}")
     public String updateTask(@PathVariable Long projectId, @PathVariable Long taskId,
                              @Valid @ModelAttribute("updateTaskRequest") UpdateTaskRequest request,
@@ -83,6 +122,13 @@ public class TaskController {
         taskService.updateTask(taskId, request);
         return "redirect:/projects/" + projectId + "/tasks";
     }
+
+    /**
+     *
+     * @param projectId
+     * @param taskId
+     * @return
+     */
     @PostMapping("/delete/{taskId}")
     public String deleteTask(@PathVariable Long projectId, @PathVariable Long taskId) {
         taskService.deleteTask(taskId);
