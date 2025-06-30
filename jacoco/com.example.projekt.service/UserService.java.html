@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.example.projekt.service;
+
+import com.example.projekt.Entity.Role;
+import com.example.projekt.Entity.User;
+import com.example.projekt.dto.UserRegistrationDto;
+import com.example.projekt.exception.ResourceNotFoundException;
+import com.example.projekt.exception.UserAlreadyExistAuthenticationException;
+import com.example.projekt.repository.RoleRepository;
+import com.example.projekt.repository.UserRepository;
+import com.example.projekt.util.TotpUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import com.example.projekt.dto.TwoFactorSetupDto;
+@Service
+<span class="fc" id="L24">@RequiredArgsConstructor</span>
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public User registerNewUser(UserRegistrationDto registrationDto) throws UserAlreadyExistAuthenticationException {
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (userRepository.findByUsername(registrationDto.getUsername()).isPresent()) {</span>
+<span class="fc" id="L34">            throw new UserAlreadyExistAuthenticationException(&quot;Użytkownik o nazwie '&quot; + registrationDto.getUsername() + &quot;' już istnieje.&quot;);</span>
+        }
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (userRepository.findByEmail(registrationDto.getEmail()).isPresent()) {</span>
+<span class="fc" id="L37">            throw new UserAlreadyExistAuthenticationException(&quot;Użytkownik z adresem email '&quot; + registrationDto.getEmail() + &quot;' już istnieje.&quot;);</span>
+        }
+
+<span class="fc" id="L40">        User user = new User();</span>
+<span class="fc" id="L41">        user.setUsername(registrationDto.getUsername());</span>
+<span class="fc" id="L42">        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));</span>
+<span class="fc" id="L43">        user.setFullName(registrationDto.getFullName());</span>
+<span class="fc" id="L44">        user.setEmail(registrationDto.getEmail());</span>
+<span class="fc" id="L45">        user.setEnabled(true);</span>
+
+<span class="fc" id="L47">        Role userRole = roleRepository.findByName(&quot;ROLE_EMPLOYEE&quot;)</span>
+<span class="pc" id="L48">                .orElseThrow(() -&gt; new RuntimeException(&quot;Błąd: Rola ROLE_EMPLOYEE nie została znaleziona.&quot;));</span>
+<span class="fc" id="L49">        user.setRoles(new HashSet&lt;&gt;(Collections.singletonList(userRole)));</span>
+
+<span class="fc" id="L51">        return userRepository.save(user);</span>
+    }
+
+    public boolean usernameExists(String username) {
+<span class="fc" id="L55">        return userRepository.findByUsername(username).isPresent();</span>
+    }
+
+    public boolean emailExists(String email) {
+<span class="fc" id="L59">        return userRepository.findByEmail(email).isPresent();</span>
+    }
+    @Transactional(readOnly = true)
+    public List&lt;User&gt; findAllUsers() {
+<span class="fc" id="L63">        return userRepository.findAll();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserById(Long userId) {
+<span class="fc" id="L68">        return userRepository.findById(userId)</span>
+<span class="fc" id="L69">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;id&quot;, userId));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;Role&gt; findAllRoles() {
+<span class="fc" id="L74">        return roleRepository.findAll();</span>
+    }
+
+
+    @Transactional
+    public User updateUserRoles(Long userId, Set&lt;Long&gt; roleIds) {
+<span class="fc" id="L80">        User user = findUserById(userId);</span>
+<span class="fc" id="L81">        Set&lt;Role&gt; newRoles = roleIds.stream()</span>
+<span class="fc" id="L82">                .map(roleId -&gt; roleRepository.findById(roleId)</span>
+<span class="fc" id="L83">                        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Role&quot;, &quot;id&quot;, roleId)))</span>
+<span class="fc" id="L84">                .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L86">        user.setRoles(newRoles);</span>
+<span class="fc" id="L87">        return userRepository.save(user);</span>
+    }
+    @Transactional
+    public TwoFactorSetupDto setupTwoFactorAuthentication(String username) {
+<span class="fc" id="L91">        User user = userRepository.findByUsername(username)</span>
+<span class="pc" id="L92">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;username&quot;, username));</span>
+
+<span class="fc" id="L94">        TwoFactorSetupDto dto = new TwoFactorSetupDto();</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (user.isTwoFactorEnabled()) {</span>
+<span class="fc" id="L96">            dto.setEnabled(true);</span>
+        } else {
+<span class="fc" id="L98">            String secret = TotpUtil.generateSecret();</span>
+<span class="fc" id="L99">            user.setTwoFactorSecret(secret);</span>
+<span class="fc" id="L100">            userRepository.save(user);</span>
+<span class="fc" id="L101">            String issuer = &quot;TwojaAplikacja&quot;;</span>
+<span class="fc" id="L102">            String totpUri = TotpUtil.generateTotpUri(issuer, user.getUsername(), secret);</span>
+<span class="fc" id="L103">            dto.setEnabled(false);</span>
+<span class="fc" id="L104">            dto.setSecret(secret);</span>
+<span class="fc" id="L105">            dto.setManualEntryKey(secret);</span>
+<span class="fc" id="L106">            dto.setQrCodeUri(TotpUtil.generateQrCode(totpUri));</span>
+        }
+<span class="fc" id="L108">        return dto;</span>
+    }
+
+    @Transactional
+    public boolean enableTwoFactorAuthentication(String username, String code) {
+<span class="fc" id="L113">        User user = userRepository.findByUsername(username)</span>
+<span class="pc" id="L114">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;username&quot;, username));</span>
+
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (user.getTwoFactorSecret() == null) {</span>
+<span class="fc" id="L117">            throw new IllegalStateException(&quot;Sekret 2FA nie został jeszcze wygenerowany dla tego użytkownika.&quot;);</span>
+        }
+
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (TotpUtil.verifyCode(user.getTwoFactorSecret(), code)) {</span>
+<span class="fc" id="L121">            user.setTwoFactorEnabled(true);</span>
+<span class="fc" id="L122">            userRepository.save(user);</span>
+<span class="fc" id="L123">            return true;</span>
+        }
+<span class="fc" id="L125">        return false;</span>
+    }
+
+    @Transactional
+    public void disableTwoFactorAuthentication(String username) {
+<span class="fc" id="L130">        User user = userRepository.findByUsername(username)</span>
+<span class="pc" id="L131">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;username&quot;, username));</span>
+<span class="fc" id="L132">        user.setTwoFactorEnabled(false);</span>
+<span class="fc" id="L133">        user.setTwoFactorSecret(null);</span>
+<span class="fc" id="L134">        userRepository.save(user);</span>
+<span class="fc" id="L135">    }</span>
+    public boolean isTwoFactorEnabledForUser(String username) {
+<span class="fc" id="L137">        return userRepository.findByUsername(username)</span>
+<span class="fc" id="L138">                .map(User::isTwoFactorEnabled)</span>
+<span class="fc" id="L139">                .orElse(false);</span>
+    }
+
+    public boolean verifyTotpCodeForUser(String username, String code) {
+<span class="fc" id="L143">        User user = userRepository.findByUsername(username)</span>
+<span class="pc" id="L144">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;username&quot;, username));</span>
+<span class="fc bfc" id="L145" title="All 4 branches covered.">        if (user.getTwoFactorSecret() == null || !user.isTwoFactorEnabled()) {</span>
+<span class="fc" id="L146">            return false;</span>
+        }
+<span class="fc" id="L148">        return TotpUtil.verifyCode(user.getTwoFactorSecret(), code);</span>
+    }
+    @Transactional
+    public void deleteUserById(Long userId) {
+<span class="fc" id="L152">        User userToDelete = userRepository.findById(userId)</span>
+<span class="fc" id="L153">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;id&quot;, userId));</span>
+<span class="fc" id="L154">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L155" title="1 of 4 branches missed.">        if (authentication != null &amp;&amp; authentication.getName().equals(userToDelete.getUsername())) {</span>
+<span class="fc" id="L156">            throw new IllegalArgumentException(&quot;Nie możesz usunąć własnego konta.&quot;);</span>
+        }
+
+        // Można dodać logikę sprawdzania, czy to nie jest np. jedyne konto z rolą ADMIN
+        // if (userToDelete.getRoles().stream().anyMatch(role -&gt; role.getName().equals(&quot;ROLE_ADMIN&quot;)) &amp;&amp;
+        //     userRepository.findAll().stream().filter(u -&gt; u.getRoles().stream().anyMatch(r -&gt; r.getName().equals(&quot;ROLE_ADMIN&quot;))).count() &lt;= 1) {
+        //     throw new IllegalStateException(&quot;Nie można usunąć ostatniego konta administratora.&quot;);
+        // }
+
+<span class="fc" id="L165">        userRepository.delete(userToDelete);</span>
+<span class="fc" id="L166">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

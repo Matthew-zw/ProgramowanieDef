@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.controller</a> &gt; <span class="el_source">AdminController.java</span></div><h1>AdminController.java</h1><pre class="source lang-java linenums">package com.example.projekt.controller;
+import com.example.projekt.Entity.Role;
+import com.example.projekt.Entity.User;
+import com.example.projekt.dto.UserRoleUpdateDto;
+import com.example.projekt.exception.ResourceNotFoundException;
+import com.example.projekt.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Controller
+@RequestMapping(&quot;/admin&quot;)
+@PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+<span class="fc" id="L22">@RequiredArgsConstructor</span>
+public class AdminController {
+
+    private final UserService userService;
+    @GetMapping(&quot;/users&quot;)
+    public String listUsers(Model model) {
+<span class="fc" id="L28">        model.addAttribute(&quot;users&quot;, userService.findAllUsers());</span>
+<span class="fc" id="L29">        return &quot;admin/users-list&quot;;</span>
+    }
+    @GetMapping(&quot;/users/edit-roles/{userId}&quot;)
+    public String showEditUserRolesForm(@PathVariable Long userId, Model model) {
+<span class="nc" id="L33">        User user = userService.findUserById(userId);</span>
+<span class="nc" id="L34">        List&lt;Role&gt; allRoles = userService.findAllRoles();</span>
+
+<span class="nc" id="L36">        UserRoleUpdateDto dto = new UserRoleUpdateDto();</span>
+<span class="nc" id="L37">        dto.setUserId(user.getId());</span>
+<span class="nc" id="L38">        dto.setUsername(user.getUsername());</span>
+<span class="nc" id="L39">        dto.setRoleIds(user.getRoles().stream().map(Role::getId).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L41">        model.addAttribute(&quot;userRoleUpdateDto&quot;, dto);</span>
+<span class="nc" id="L42">        model.addAttribute(&quot;allRoles&quot;, allRoles);</span>
+<span class="nc" id="L43">        return &quot;admin/user-edit-roles&quot;;</span>
+    }
+    @PostMapping(&quot;/users/update-roles&quot;)
+    public String updateUserRoles(@Valid @ModelAttribute(&quot;userRoleUpdateDto&quot;) UserRoleUpdateDto userRoleUpdateDto,
+                                  BindingResult result,
+                                  RedirectAttributes redirectAttributes,
+                                  Model model) {
+
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L52">            model.addAttribute(&quot;allRoles&quot;, userService.findAllRoles());</span>
+<span class="nc" id="L53">            return &quot;admin/user-edit-roles&quot;;</span>
+        }
+
+        try {
+<span class="nc" id="L57">            userService.updateUserRoles(userRoleUpdateDto.getUserId(), userRoleUpdateDto.getRoleIds());</span>
+<span class="nc" id="L58">            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Role użytkownika &quot; + userRoleUpdateDto.getUsername() + &quot; zostały zaktualizowane.&quot;);</span>
+<span class="nc" id="L59">        } catch (Exception e) {</span>
+<span class="nc" id="L60">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Wystąpił błąd podczas aktualizacji ról: &quot; + e.getMessage());</span>
+<span class="nc" id="L61">        }</span>
+<span class="nc" id="L62">        return &quot;redirect:/admin/users&quot;;</span>
+    }
+    @PostMapping(&quot;/users/delete/{userId}&quot;)
+    public String deleteUser(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
+        try {
+<span class="fc" id="L67">            User user = userService.findUserById(userId);</span>
+<span class="fc" id="L68">            userService.deleteUserById(userId);</span>
+<span class="fc" id="L69">            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Użytkownik '&quot; + user.getUsername() + &quot;' został pomyślnie usunięty.&quot;);</span>
+<span class="nc" id="L70">        } catch (ResourceNotFoundException e) {</span>
+<span class="nc" id="L71">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Nie znaleziono użytkownika o podanym ID.&quot;);</span>
+<span class="nc" id="L72">        } catch (IllegalArgumentException | IllegalStateException e) {</span>
+<span class="nc" id="L73">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, e.getMessage());</span>
+<span class="nc" id="L74">        } catch (Exception e) {</span>
+<span class="nc" id="L75">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Wystąpił błąd podczas usuwania użytkownika: &quot; + e.getMessage());</span>
+<span class="pc" id="L76">        }</span>
+<span class="fc" id="L77">        return &quot;redirect:/admin/users&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

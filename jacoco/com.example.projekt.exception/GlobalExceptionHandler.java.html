@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.example.projekt.exception;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@ControllerAdvice
+<span class="fc" id="L15">public class GlobalExceptionHandler {</span>
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;?&gt; handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request){
+<span class="fc" id="L18">        Map&lt;String,Object&gt; body = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L19">        body.put(&quot;timestamp&quot;, LocalDateTime.now());</span>
+<span class="fc" id="L20">        body.put(&quot;status&quot;, HttpStatus.NOT_FOUND.value());</span>
+<span class="fc" id="L21">        body.put(&quot;message&quot;, ex.getMessage());</span>
+<span class="fc" id="L22">        body.put(&quot;path&quot;, request.getDescription(false).replace(&quot;uri&quot;,&quot;&quot;));</span>
+<span class="fc" id="L23">        return new ResponseEntity&lt;&gt;(body, HttpStatus.NOT_FOUND);</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;?&gt; handleValidationException(MethodArgumentNotValidException ex, WebRequest request){
+<span class="nc" id="L28">        Map&lt;String,String&gt; errors = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L29">        ex.getBindingResult().getAllErrors().forEach((error) -&gt; {</span>
+<span class="nc" id="L30">            String fieldName = ((FieldError) error).getField();</span>
+<span class="nc" id="L31">            String errorMessage = error.getDefaultMessage();</span>
+<span class="nc" id="L32">            errors.put(fieldName, errorMessage);</span>
+<span class="nc" id="L33">        });</span>
+
+<span class="nc" id="L35">        Map&lt;String,Object&gt; body = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L36">        body.put(&quot;timestamp&quot;, LocalDateTime.now());</span>
+<span class="nc" id="L37">        body.put(&quot;status&quot;, HttpStatus.BAD_REQUEST.value());</span>
+<span class="nc" id="L38">        body.put(&quot;error&quot;,&quot;Validation Error&quot;);</span>
+<span class="nc" id="L39">        body.put(&quot;messages&quot;, errors);</span>
+<span class="nc" id="L40">        body.put(&quot;path&quot;, request.getDescription(false).replace(&quot;uri&quot;,&quot;&quot;));</span>
+<span class="nc" id="L41">        return new ResponseEntity&lt;&gt;(body, HttpStatus.BAD_REQUEST);</span>
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;?&gt; handleGlobalException(Exception ex, WebRequest request){
+<span class="nc" id="L45">        Map&lt;String,Object&gt; body = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L46">        body.put(&quot;timestamp&quot;, LocalDateTime.now());</span>
+<span class="nc" id="L47">        body.put(&quot;status&quot;, HttpStatus.INTERNAL_SERVER_ERROR.value());</span>
+<span class="nc" id="L48">        body.put(&quot;error&quot;, &quot;Internal Server Error&quot;);</span>
+<span class="nc" id="L49">        body.put(&quot;message&quot;, &quot;An unexpected error occurred&quot; + ex.getMessage());</span>
+<span class="nc" id="L50">        body.put(&quot;path&quot;, request.getDescription(false).replace(&quot;uri&quot;,&quot;&quot;));</span>
+<span class="nc" id="L51">        return new ResponseEntity&lt;&gt;(body, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+    }
+    @ExceptionHandler(UserAlreadyExistAuthenticationException.class)
+    public ResponseEntity&lt;?&gt; handleUserAlreadyExistException(UserAlreadyExistAuthenticationException ex, WebRequest request) {
+<span class="nc" id="L55">        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L56">        body.put(&quot;timestamp&quot;, LocalDateTime.now());</span>
+<span class="nc" id="L57">        body.put(&quot;status&quot;, HttpStatus.CONFLICT.value()); // 409 Conflict</span>
+<span class="nc" id="L58">        body.put(&quot;error&quot;, &quot;User Already Exists&quot;);</span>
+<span class="nc" id="L59">        body.put(&quot;message&quot;, ex.getMessage());</span>
+<span class="nc" id="L60">        body.put(&quot;path&quot;, request.getDescription(false).replace(&quot;uri=&quot;, &quot;&quot;));</span>
+<span class="nc" id="L61">        return new ResponseEntity&lt;&gt;(body, HttpStatus.CONFLICT);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

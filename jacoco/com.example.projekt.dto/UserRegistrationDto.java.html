@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserRegistrationDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.dto</a> &gt; <span class="el_source">UserRegistrationDto.java</span></div><h1>UserRegistrationDto.java</h1><pre class="source lang-java linenums">package com.example.projekt.dto;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+<span class="pc bfc" id="L4" title="All 44 branches covered.">@Data</span>
+public final class UserRegistrationDto {
+
+    @NotBlank(message = &quot;Nazwa użytkownika jest wymagana.&quot;)
+    @Size(min = 3, max = 50, message = &quot;Nazwa użytkownika musi mieć od 3 do 50 znaków.&quot;)
+<span class="fc" id="L9">    private String username;</span>
+
+    @NotBlank(message = &quot;Hasło jest wymagane.&quot;)
+    @Size(min = 6, max = 100, message = &quot;Hasło musi mieć od 6 do 100 znaków.&quot;)
+<span class="fc" id="L13">    private String password;</span>
+
+    @NotBlank(message = &quot;Potwierdzenie hasła jest wymagane.&quot;)
+<span class="fc" id="L16">    private String confirmPassword;</span>
+
+    @NotBlank(message = &quot;Imię i nazwisko jest wymagane.&quot;)
+    @Size(max = 100, message = &quot;Imię i nazwisko nie może przekraczać 100 znaków.&quot;)
+<span class="fc" id="L20">    private String fullName;</span>
+
+    @NotBlank(message = &quot;Adres email jest wymagany.&quot;)
+    @Email(message = &quot;Nieprawidłowy format adresu email.&quot;)
+    @Size(max = 100, message = &quot;Adres email nie może przekraczać 100 znaków.&quot;)
+<span class="fc" id="L25">    private String email;</span>
+
+    // Walidator na poziomie klasy, aby sprawdzić, czy hasła się zgadzają
+    @AssertTrue(message = &quot;Hasła muszą być takie same.&quot;)
+    public boolean isPasswordConfirmed() {
+<span class="fc bfc" id="L30" title="All 4 branches covered.">        return password != null &amp;&amp; password.equals(confirmPassword);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

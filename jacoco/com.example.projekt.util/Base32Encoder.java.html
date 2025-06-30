@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Base32Encoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.util</a> &gt; <span class="el_source">Base32Encoder.java</span></div><h1>Base32Encoder.java</h1><pre class="source lang-java linenums">package com.example.projekt.util;
+
+<span class="nc" id="L3">public class Base32Encoder {</span>
+    private static final String ALPHABET = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;;
+    private static final int BITS_PER_CHAR = 5;
+
+    public static String encode(byte[] data) {
+<span class="fc bfc" id="L8" title="All 4 branches covered.">        if (data == null || data.length == 0) {</span>
+<span class="fc" id="L9">            return &quot;&quot;;</span>
+        }
+
+<span class="fc" id="L12">        int i = 0, index = 0, digit;</span>
+        int currentByte, nextByte;
+<span class="fc" id="L14">        StringBuilder base32 = new StringBuilder((data.length + 4) * 8 / 5);</span>
+
+<span class="fc bfc" id="L16" title="All 2 branches covered.">        while (i &lt; data.length) {</span>
+<span class="fc bfc" id="L17" title="All 2 branches covered.">            currentByte = (data[i] &gt;= 0) ? data[i] : (data[i] + 256);</span>
+
+<span class="fc bfc" id="L19" title="All 2 branches covered.">            if (index &gt; 3) {</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">                if ((i + 1) &lt; data.length) {</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">                    nextByte = (data[i + 1] &gt;= 0) ? data[i + 1] : (data[i + 1] + 256);</span>
+                } else {
+<span class="fc" id="L23">                    nextByte = 0;</span>
+                }
+<span class="fc" id="L25">                digit = currentByte &amp; (0xFF &gt;&gt; index);</span>
+<span class="fc" id="L26">                index = (index + 5) % 8;</span>
+<span class="fc" id="L27">                digit &lt;&lt;= index;</span>
+<span class="fc" id="L28">                digit |= nextByte &gt;&gt; (8 - index);</span>
+<span class="fc" id="L29">                i++;</span>
+            } else {
+<span class="fc" id="L31">                digit = (currentByte &gt;&gt; (8 - (index + 5))) &amp; 0x1F;</span>
+<span class="fc" id="L32">                index = (index + 5) % 8;</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">                if (index == 0)</span>
+<span class="fc" id="L34">                    i++;</span>
+            }
+<span class="fc" id="L36">            base32.append(ALPHABET.charAt(digit));</span>
+        }
+
+        // Twoja oryginalna implementacja nie miała paddingu, co jest OK dla TOTP.
+        // Zostawiamy to tak, jak było.
+
+<span class="fc" id="L42">        return base32.toString();</span>
+    }
+
+
+    public static byte[] decode(String data) {
+<span class="pc bpc" id="L47" title="2 of 4 branches missed.">        if (data == null || data.isEmpty()) {</span>
+<span class="nc" id="L48">            return new byte[0];</span>
+        }
+
+        // Twoja implementacja `replaceAll` była głównym źródłem problemów.
+        // Usuwamy ją i zastępujemy pętlą, która buduje czysty ciąg.
+<span class="fc" id="L53">        StringBuilder cleanDataBuilder = new StringBuilder();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        for (char c : data.toUpperCase().toCharArray()) {</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            if (ALPHABET.indexOf(c) != -1) {</span>
+<span class="fc" id="L56">                cleanDataBuilder.append(c);</span>
+            }
+        }
+<span class="fc" id="L59">        String cleanData = cleanDataBuilder.toString();</span>
+
+
+<span class="fc" id="L62">        int outputLength = (cleanData.length() * BITS_PER_CHAR) / 8;</span>
+<span class="fc" id="L63">        byte[] result = new byte[outputLength];</span>
+
+<span class="fc" id="L65">        int buffer = 0;</span>
+<span class="fc" id="L66">        int bitsLeft = 0;</span>
+<span class="fc" id="L67">        int byteIndex = 0;</span>
+
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        for (char c : cleanData.toCharArray()) {</span>
+<span class="fc" id="L70">            int value = ALPHABET.indexOf(c);</span>
+
+<span class="fc" id="L72">            buffer = (buffer &lt;&lt; BITS_PER_CHAR) | value;</span>
+<span class="fc" id="L73">            bitsLeft += BITS_PER_CHAR;</span>
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (bitsLeft &gt;= 8) {</span>
+<span class="fc" id="L76">                bitsLeft -= 8;</span>
+<span class="fc" id="L77">                result[byteIndex++] = (byte) ((buffer &gt;&gt; bitsLeft) &amp; 0xff);</span>
+            }
+        }
+
+<span class="fc" id="L81">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

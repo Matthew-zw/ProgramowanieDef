@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProjectController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.controller</a> &gt; <span class="el_source">ProjectController.java</span></div><h1>ProjectController.java</h1><pre class="source lang-java linenums">package com.example.projekt.controller;
+
+import com.example.projekt.dto.CreateProjectRequest;
+import com.example.projekt.dto.ProjectDTO;
+import com.example.projekt.dto.UpdateProjectRequest;
+import com.example.projekt.service.ProjectService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import com.example.projekt.dto.AssignUsersToProjectDto;
+import com.example.projekt.dto.UserDTO;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+@Controller
+@RequestMapping(&quot;/projects&quot;)
+<span class="fc" id="L22">@RequiredArgsConstructor</span>
+
+public class ProjectController {
+    private final ProjectService projectService;
+
+
+    @GetMapping(&quot;/new&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_PROJECT_MANAGER')&quot;)
+    public String showCreateProjectForm(Model model) {
+<span class="fc" id="L31">        model.addAttribute(&quot;createProjectRequest&quot;, new CreateProjectRequest());</span>
+<span class="fc" id="L32">        return &quot;projects/form&quot;;</span>
+    }
+
+    @PostMapping
+    @PreAuthorize(&quot;hasRole('ROLE_PROJECT_MANAGER')&quot;)
+    public String createProject(@Valid @ModelAttribute(&quot;createProjectRequest&quot;) CreateProjectRequest request,
+                                BindingResult result, Model model) {
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (result.hasErrors()) {</span>
+<span class="fc" id="L40">            return &quot;projects/form&quot;;</span>
+        }
+<span class="fc" id="L42">        projectService.createProject(request);</span>
+<span class="fc" id="L43">        return &quot;redirect:/projects&quot;;</span>
+    }
+    @GetMapping(&quot;/edit/{projectId}&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_PROJECT_MANAGER')&quot;)
+    public String showUpdateProjectForm(@PathVariable Long projectId, Model model) {
+<span class="nc" id="L48">        ProjectDTO projectDTO = projectService.getProjectById(projectId);</span>
+<span class="nc" id="L49">        UpdateProjectRequest updateRequest = new UpdateProjectRequest();</span>
+<span class="nc" id="L50">        updateRequest.setName(projectDTO.getName());</span>
+<span class="nc" id="L51">        updateRequest.setDescription(projectDTO.getDescription());</span>
+<span class="nc" id="L52">        updateRequest.setStartDate(projectDTO.getStartDate());</span>
+<span class="nc" id="L53">        updateRequest.setEndDate(projectDTO.getEndDate());</span>
+
+<span class="nc" id="L55">        model.addAttribute(&quot;updateProjectRequest&quot;, updateRequest);</span>
+<span class="nc" id="L56">        model.addAttribute(&quot;projectId&quot;, projectId);</span>
+<span class="nc" id="L57">        return &quot;projects/edit-form&quot;;</span>
+    }
+    @PostMapping(&quot;/update/{projectId}&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_PROJECT_MANAGER')&quot;)
+    public String updateProject(@PathVariable Long projectId,
+                                @Valid @ModelAttribute(&quot;updateProjectRequest&quot;) UpdateProjectRequest request,
+                                BindingResult result, Model model) {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L65">            model.addAttribute(&quot;projectId&quot;, projectId);</span>
+<span class="nc" id="L66">            return &quot;projects/edit-form&quot;;</span>
+        }
+<span class="nc" id="L68">        projectService.updateProject(projectId, request);</span>
+<span class="nc" id="L69">        return &quot;redirect:/projects&quot;;</span>
+    }
+
+    @PreAuthorize(&quot;hasRole('ROLE_PROJECT_MANAGER')&quot;)
+    @PostMapping(&quot;/delete/{projectId}&quot;)
+    public String deleteProject(@PathVariable Long projectId) {
+<span class="fc" id="L75">        projectService.deleteProject(projectId);</span>
+<span class="fc" id="L76">        return &quot;redirect:/projects&quot;;</span>
+    }
+    @GetMapping(&quot;/assign-users/{projectId}&quot;)
+    @PreAuthorize(&quot;hasAuthority('ROLE_PROJECT_MANAGER')&quot;)
+    public String showAssignUsersForm(@PathVariable Long projectId, Model model) {
+<span class="nc" id="L81">        ProjectDTO project = projectService.getProjectById(projectId);</span>
+<span class="nc" id="L82">        Set&lt;UserDTO&gt; assignedUsers = projectService.getAssignedUsersForProject(projectId);</span>
+<span class="nc" id="L83">        List&lt;UserDTO&gt; allUsers = projectService.getAllUsersAvailableForAssignment();</span>
+
+<span class="nc" id="L85">        AssignUsersToProjectDto dto = new AssignUsersToProjectDto();</span>
+<span class="nc" id="L86">        dto.setProjectId(project.getId());</span>
+<span class="nc" id="L87">        dto.setProjectName(project.getName());</span>
+<span class="nc" id="L88">        dto.setUserIds(assignedUsers.stream().map(UserDTO::getId).collect(Collectors.toSet()));</span>
+
+<span class="nc" id="L90">        model.addAttribute(&quot;assignUsersDto&quot;, dto);</span>
+<span class="nc" id="L91">        model.addAttribute(&quot;allAvailableUsers&quot;, allUsers);</span>
+<span class="nc" id="L92">        return &quot;projects/assign-users-form&quot;;</span>
+    }
+
+
+    @PostMapping(&quot;/assign-users&quot;)
+    @PreAuthorize(&quot;hasAuthority('ROLE_PROJECT_MANAGER')&quot;)
+    public String processAssignUsers(@ModelAttribute(&quot;assignUsersDto&quot;) AssignUsersToProjectDto dto,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+<span class="nc" id="L101">            projectService.assignUsersToProject(dto.getProjectId(), dto.getUserIds());</span>
+<span class="nc" id="L102">            redirectAttributes.addFlashAttribute(&quot;successMessage&quot;, &quot;Użytkownicy zostali pomyślnie przypisani do projektu '&quot; + dto.getProjectName() + &quot;'.&quot;);</span>
+<span class="nc" id="L103">        } catch (Exception e) {</span>
+<span class="nc" id="L104">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, &quot;Wystąpił błąd podczas przypisywania użytkowników: &quot; + e.getMessage());</span>
+<span class="nc" id="L105">        }</span>
+<span class="nc" id="L106">        return &quot;redirect:/projects&quot;;</span>
+    }
+    @GetMapping
+    public String listProjects(Model model) {
+<span class="fc" id="L110">        model.addAttribute(&quot;projects&quot;, projectService.getProjectsForCurrentUser());</span>
+<span class="fc" id="L111">        return &quot;projects/list&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegistrationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.controller</a> &gt; <span class="el_source">RegistrationController.java</span></div><h1>RegistrationController.java</h1><pre class="source lang-java linenums">package com.example.projekt.controller;
+
+import com.example.projekt.dto.UserRegistrationDto;
+import com.example.projekt.exception.UserAlreadyExistAuthenticationException;
+import com.example.projekt.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+
+@Controller
+@RequestMapping(&quot;/register&quot;)
+<span class="fc" id="L21">@RequiredArgsConstructor</span>
+public class RegistrationController {
+
+    private final UserService userService;
+
+    @ModelAttribute(&quot;userRegistrationDto&quot;)
+    public UserRegistrationDto userRegistrationDto() {
+<span class="nc" id="L28">        return new UserRegistrationDto();</span>
+    }
+
+    @GetMapping
+    public String showRegistrationForm(Model model) {
+<span class="nc" id="L33">        return &quot;register&quot;;</span>
+    }
+
+    @PostMapping
+    public String registerUserAccount(@Valid @ModelAttribute(&quot;userRegistrationDto&quot;) UserRegistrationDto registrationDto,
+                                      BindingResult result,
+                                      RedirectAttributes redirectAttributes) {
+
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (userService.usernameExists(registrationDto.getUsername())) {</span>
+<span class="nc" id="L42">            result.addError(new FieldError(&quot;userRegistrationDto&quot;, &quot;username&quot;, &quot;Nazwa użytkownika jest już zajęta.&quot;));</span>
+        }
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (userService.emailExists(registrationDto.getEmail())) {</span>
+<span class="nc" id="L45">            result.addError(new FieldError(&quot;userRegistrationDto&quot;, &quot;email&quot;, &quot;Adres email jest już zajęty.&quot;));</span>
+        }
+
+
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L50">            return &quot;register&quot;;</span>
+        }
+
+        try {
+<span class="nc" id="L54">            userService.registerNewUser(registrationDto);</span>
+<span class="nc" id="L55">            redirectAttributes.addFlashAttribute(&quot;registrationSuccess&quot;, &quot;Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.&quot;);</span>
+<span class="nc" id="L56">            return &quot;redirect:/login&quot;;</span>
+<span class="nc" id="L57">        } catch (UserAlreadyExistAuthenticationException e) {</span>
+<span class="nc" id="L58">            result.reject(&quot;user.exists.general&quot;, e.getMessage());</span>
+<span class="nc" id="L59">            return &quot;register&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

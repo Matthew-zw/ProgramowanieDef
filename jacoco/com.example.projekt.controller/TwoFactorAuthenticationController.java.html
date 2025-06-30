@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TwoFactorAuthenticationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.controller</a> &gt; <span class="el_source">TwoFactorAuthenticationController.java</span></div><h1>TwoFactorAuthenticationController.java</h1><pre class="source lang-java linenums">package com.example.projekt.controller;
+
+import com.example.projekt.dto.VerifyTotpCodeDto;
+import com.example.projekt.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
+@Controller
+<span class="fc" id="L23">@RequiredArgsConstructor</span>
+public class TwoFactorAuthenticationController {
+
+    private final UserService userService;
+    private final UserDetailsService userDetailsService;
+
+    @GetMapping(&quot;/verify-2fa&quot;)
+    public String showVerify2faForm(HttpServletRequest request, Model model) {
+<span class="nc" id="L31">        HttpSession session = request.getSession(false);</span>
+<span class="nc bnc" id="L32" title="All 4 branches missed.">        if (session == null || session.getAttribute(&quot;TEMP_AUTHENTICATED_USER&quot;) == null) {</span>
+<span class="nc" id="L33">            return &quot;redirect:/login&quot;;</span>
+        }
+<span class="nc" id="L35">        model.addAttribute(&quot;verifyTotpCodeDto&quot;, new VerifyTotpCodeDto());</span>
+<span class="nc" id="L36">        return &quot;auth/verify-2fa&quot;;</span>
+    }
+
+    @PostMapping(&quot;/perform_verify_2fa&quot;)
+    public String verify2faCode(@ModelAttribute(&quot;verifyTotpCodeDto&quot;) @Valid VerifyTotpCodeDto verifyDto,
+                                BindingResult result,
+                                HttpServletRequest request,
+                                Model model) {
+<span class="nc" id="L44">        HttpSession session = request.getSession(false);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (session == null) {</span>
+<span class="nc" id="L46">            return &quot;redirect:/login&quot;;</span>
+        }
+<span class="nc" id="L48">        String username = (String) session.getAttribute(&quot;TEMP_AUTHENTICATED_USER&quot;);</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (username == null) {</span>
+<span class="nc" id="L50">            return &quot;redirect:/login&quot;;</span>
+        }
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (result.hasErrors()) {</span>
+<span class="nc" id="L54">            return &quot;auth/verify-2fa&quot;;</span>
+        }
+
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (userService.verifyTotpCodeForUser(username, verifyDto.getCode())) {</span>
+<span class="nc" id="L58">            session.removeAttribute(&quot;TEMP_AUTHENTICATED_USER&quot;);</span>
+<span class="nc" id="L59">            UserDetails userDetails = userDetailsService.loadUserByUsername(username);</span>
+<span class="nc" id="L60">            Authentication newAuthentication = new UsernamePasswordAuthenticationToken(</span>
+<span class="nc" id="L61">                    userDetails, null, userDetails.getAuthorities());</span>
+<span class="nc" id="L62">            SecurityContextHolder.getContext().setAuthentication(newAuthentication);</span>
+
+            // Sprawdź rolę użytkownika po pomyślnej weryfikacji 2FA
+<span class="nc" id="L65">            boolean isAdminAfter2FA = userDetails.getAuthorities().stream()</span>
+<span class="nc" id="L66">                    .map(GrantedAuthority::getAuthority)</span>
+<span class="nc" id="L67">                    .anyMatch(role -&gt; role.equals(&quot;ROLE_ADMIN&quot;));</span>
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (isAdminAfter2FA) {</span>
+<span class="nc" id="L70">                return &quot;redirect:/admin/users&quot;;</span>
+            } else {
+<span class="nc" id="L72">                return &quot;redirect:/projects&quot;;</span>
+            }
+        } else {
+<span class="nc" id="L75">            model.addAttribute(&quot;errorMessage&quot;, &quot;Nieprawidłowy kod uwierzytelniający.&quot;);</span>
+<span class="nc" id="L76">            return &quot;auth/verify-2fa&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

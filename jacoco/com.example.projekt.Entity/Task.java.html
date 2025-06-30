@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Task.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.Entity</a> &gt; <span class="el_source">Task.java</span></div><h1>Task.java</h1><pre class="source lang-java linenums">package com.example.projekt.Entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = &quot;tasks&quot;)
+<span class="pc" id="L11">@Data</span>
+<span class="fc" id="L12">@NoArgsConstructor</span>
+public class Task {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L16">    private Long id;</span>
+    @Column(nullable = false,length = 150)
+<span class="fc" id="L18">    private String title;</span>
+    @Column(length = 1000)
+<span class="fc" id="L20">    private String description;</span>
+<span class="fc" id="L21">    @Enumerated(EnumType.STRING)</span>
+    @Column(nullable = false, length = 20)
+<span class="fc" id="L23">    private TaskStatus status = TaskStatus.TODO;</span>
+    @Column(name=&quot;due_time&quot;)
+<span class="fc" id="L25">    private LocalDateTime dueDate;</span>
+    @Column(name = &quot;created_at&quot;, updatable = false)
+<span class="fc" id="L27">    private LocalDateTime createdAt;</span>
+    @Column(name= &quot;updated_at&quot;)
+<span class="fc" id="L29">    private LocalDateTime updatedAt;</span>
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;project_id&quot;, nullable =false)
+<span class="fc" id="L32">    private Project project;</span>
+    @PrePersist
+    protected void onCreate(){
+<span class="fc" id="L35">        createdAt = LocalDateTime.now();</span>
+<span class="fc" id="L36">        updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L37">    }</span>
+    @PreUpdate
+    protected void onUpdate(){
+<span class="nc" id="L40">        updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L41">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (this == o) return true;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (!(o instanceof Task task)) return false;</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">        return id != null &amp;&amp; id.equals(task.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L52">        return getClass().hashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

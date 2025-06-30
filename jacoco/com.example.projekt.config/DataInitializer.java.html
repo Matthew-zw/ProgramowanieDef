@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Projekt</a> &gt; <a href="index.source.html" class="el_package">com.example.projekt.config</a> &gt; <span class="el_source">DataInitializer.java</span></div><h1>DataInitializer.java</h1><pre class="source lang-java linenums">package com.example.projekt.config;
+
+import com.example.projekt.Entity.Role;
+import com.example.projekt.Entity.User;
+import com.example.projekt.repository.RoleRepository;
+import com.example.projekt.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Set;
+
+
+@Component
+<span class="fc" id="L18">@RequiredArgsConstructor</span>
+public class DataInitializer implements CommandLineRunner {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    @Transactional
+    public void run(String... args) throws Exception {
+<span class="fc" id="L28">        Role adminRole = createRoleIfNotFound(&quot;ROLE_ADMIN&quot;);</span>
+<span class="fc" id="L29">        Role managerRole = createRoleIfNotFound(&quot;ROLE_PROJECT_MANAGER&quot;);</span>
+<span class="fc" id="L30">        Role employeeRole = createRoleIfNotFound(&quot;ROLE_EMPLOYEE&quot;);</span>
+<span class="fc" id="L31">        createUserIfNotFound(&quot;admin&quot;, &quot;admin123&quot;, &quot;Administrator&quot;, &quot;admin@example.com&quot;, Set.of(&quot;ROLE_ADMIN&quot;));</span>
+<span class="fc" id="L32">        createUserIfNotFound(&quot;manager&quot;, &quot;manager123&quot;, &quot;Manager&quot;, &quot;manager@example.com&quot;, Set.of(&quot;ROLE_PROJECT_MANAGER&quot;, &quot;ROLE_EMPLOYEE&quot;));</span>
+<span class="fc" id="L33">        createUserIfNotFound(&quot;user&quot;, &quot;user123&quot;, &quot;User&quot;, &quot;user@example.com&quot;, Set.of(&quot;ROLE_EMPLOYEE&quot;));</span>
+<span class="fc" id="L34">    }</span>
+
+    private Role createRoleIfNotFound(String name) {
+<span class="fc" id="L37">        return roleRepository.findByName(name)</span>
+<span class="pc" id="L38">                .orElseGet(() -&gt; roleRepository.save(new Role(name)));</span>
+    }
+    private void createUserIfNotFound(String username, String password, String fullName, String email, Set&lt;String&gt; roleNames) {
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        if (userRepository.findByUsername(username).isEmpty()) {</span>
+<span class="nc" id="L42">            User user = new User();</span>
+<span class="nc" id="L43">            user.setUsername(username);</span>
+<span class="nc" id="L44">            user.setPassword(passwordEncoder.encode(password));</span>
+<span class="nc" id="L45">            user.setFullName(fullName);</span>
+<span class="nc" id="L46">            user.setEmail(email);</span>
+<span class="nc" id="L47">            user.setEnabled(true);</span>
+
+<span class="nc" id="L49">            Set&lt;Role&gt; managedRoles = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            for (String roleName : roleNames) {</span>
+<span class="nc" id="L51">                Role role = roleRepository.findByName(roleName)</span>
+<span class="nc" id="L52">                        .orElseThrow(() -&gt; new RuntimeException(&quot;Error: Role &quot; + roleName + &quot; is not found.&quot;));</span>
+<span class="nc" id="L53">                managedRoles.add(role);</span>
+<span class="nc" id="L54">            }</span>
+<span class="nc" id="L55">            user.setRoles(managedRoles);</span>
+
+<span class="nc" id="L57">            userRepository.save(user);</span>
+        }
+<span class="fc" id="L59">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

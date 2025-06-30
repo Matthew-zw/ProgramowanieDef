@@ -1,0 +1,9 @@
+com.example.projekt
+com.example.projekt.config
+com.example.projekt.controller
+com.example.projekt.dto
+com.example.projekt.Entity
+com.example.projekt.exception
+com.example.projekt.repository
+com.example.projekt.service
+com.example.projekt.util
