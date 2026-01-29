@@ -36,7 +36,10 @@
                     <input type="submit" value="Usuń" class="delete-btn"/>
                 </form>
                 <a th:href="@{/projects/assign-users/{id}(id=${project.id})}" class="btn view-btn"
-                sec:authorize="hasAuthority('ROLE_PROJECT_MANAGER')">Przypisz Użytkowników</a>
+                   sec:authorize="hasAuthority('ROLE_PROJECT_MANAGER')">Przypisz Użytkowników</a>
+
+                <!-- DODAJ TEN PRZYCISK -->
+                <a th:href="@{/simulation/{id}(id=${project.id})}" class="btn details-btn" style="background-color: #1abc9c;">Symuluj RS</a>
             </div>
         </li>
     </ul>

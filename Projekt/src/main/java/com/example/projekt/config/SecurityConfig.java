@@ -95,6 +95,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                         .requestMatchers("/", "/login", "/register", "/error", "/verify-2fa", "/perform_verify_2fa").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/projects").hasRole("PROJECT_MANAGER")
                         .requestMatchers("/projects/new").hasRole("PROJECT_MANAGER")
