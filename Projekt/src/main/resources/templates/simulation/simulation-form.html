@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="'Symulacja dla Projektu: ' + ${project.name}"></title>
+</head>
+<body>
+<section>
+    <h1 th:text="'Symulacja dla projektu: ' + ${project.name}">Symulacja</h1>
+    <p><a th:href="@{/projects}">« Powrót do listy projektów</a></p>
+
+    <div style="background: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h4>Wiadomość do wysłania (opis projektu):</h4>
+        <p th:text="${project.description != null && !project.description.isEmpty() ? project.description : 'Ten projekt nie ma opisu.'}"
+           style="font-style: italic; color: #555;"></p>
+    </div>
+
+    <form th:action="@{/simulation/run}" th:object="${simulationRequest}" method="post">
+        <input type="hidden" th:field="*{projectId}" />
+        <div>
+            <label>Wybierz scenariusz symulacji:</label>
+            <div style="margin-top: 10px;">
+                <input type="radio" id="type_corruption" th:field="*{simulationType}" th:value="${T(com.example.projekt.simulation.SimulationRequest.SimulationType).MESSAGE_CORRUPTION}" />
+                <label for="type_corruption">1. Uszkodzenie wiadomości</label>
+            </div>
+            <div style="margin-top: 5px;">
+                <input type="radio" id="type_leader_failure" th:field="*{simulationType}" th:value="${T(com.example.projekt.simulation.SimulationRequest.SimulationType).LEADER_FAILURE}" />
+                <label for="type_leader_failure">2. Awaria Lidera (Węzeł 1)</label>
+            </div>
+            <div style="margin-top: 5px; margin-bottom: 20px;">
+                <input type="radio" id="type_random_failure" th:field="*{simulationType}" th:value="${T(com.example.projekt.simulation.SimulationRequest.SimulationType).RANDOM_NODE_FAILURE}" />
+                <label for="type_random_failure">3. Awaria losowego węzła (innego niż Lider)</label>
+            </div>
+        </div>
+
+        <div>
+            <label for="paritySymbols">Liczba symboli korekcyjnych (sugerowane 4-32):</label>
+            <input type="number" id="paritySymbols" th:field="*{paritySymbols}" required min="2" max="128"/>
+        </div>
+        <br/>
+        <div>
+            <label for="corruptionLevel">Liczba symulowanych błędów (tylko dla scenariusza 1):</label>
+            <input type="number" id="corruptionLevel" th:field="*{corruptionLevel}" required min="0" max="64"/>
+        </div>
+        <br/>
+        <div>
+            <button type="submit" class="submit-btn">Uruchom Symulację</button>
+            <a th:href="@{/projects}" class="cancel-btn">Anuluj</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="'Wyniki Symulacji dla: ' + ${result.projectName}"></title>
+    <style>
+        .result-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #f9f9f9; }
+        .result-box h3 { margin-top: 0; }
+        .success { color: #27ae60; font-weight: bold; }
+        .failure { color: #c0392b; font-weight: bold; }
+        .warning { color: #f39c12; background-color: #fef9e7; border: 1px solid #f39c12; padding: 10px; border-radius: 5px; white-space: pre-wrap; }
+        pre { background-color: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; }
+    </style>
+</head>
+<body>
+<section>
+    <h1 th:text="'Wyniki Symulacji dla Projektu: ' + ${result.projectName}">Wyniki Symulacji</h1>
+    <p><a th:href="@{/simulation/{id}(id=${result.projectId})}">« Uruchom nową symulację</a></p>
+    <p><a th:href="@{/projects}">« Powrót do listy projektów</a></p>
+
+    <div th:if="${result.setupError}" class="warning">
+        <p th:text="${result.setupError}"></p>
+    </div>
+
+    <div class="result-box">
+        <h3>Podsumowanie Ustawień</h3>
+        <p><strong>Oryginalna wiadomość:</strong> <span th:text="${result.originalMessage}"></span></p>
+        <p><strong>Liczba symboli korekcyjnych:</strong> <span th:text="${result.paritySymbols}"></span></p>
+        <p><strong>Liczba symulowanych błędów:</strong> <span th:text="${result.corruptionLevel}"></span></p>
+    </div>
+
+    <div th:if="${result.encodedMessageHex != null}">
+        <div class="result-box">
+            <h3>Etap 1: Kodowanie</h3>
+            <p>Poniżej znajduje się pełny blok danych (wiadomość + symbole korekcyjne) w formacie szesnastkowym:</p>
+            <pre><code th:text="${result.encodedMessageHex}"></code></pre>
+        </div>
+
+        <h2>Etap 2: Transmisja i Dekodowanie na Węzłach Sieci</h2>
+
+        <div th:each="node : ${result.nodeResults}" class="result-box">
+            <h3 th:text="'Węzeł ' + ${node.nodeId}"></h3>
+
+            <div th:if="${node.errorMessage != 'Węzeł jest wyłączony.'}">
+                <p><strong>Otrzymane (i potencjalnie uszkodzone) dane:</strong></p>
+                <pre><code th:text="${node.corruptedMessageHex}"></code></pre>
+            </div>
+
+            <h4>Wynik operacji:</h4>
+            <div th:if="${node.correctionSuccess}">
+                <p><span class="success">SUKCES</span>: Wiadomość została pomyślnie odkodowana i skorygowana.</p>
+                <p><strong>Odtworzona wiadomość:</strong> <span th:text="${node.decodedMessage}"></span></p>
+            </div>
+            <div th:unless="${node.correctionSuccess}">
+                <p><span class="failure">BŁĄD</span>: <span th:text="${node.errorMessage}"></span></p>
+            </div>
+
+            <h4>Log operacji na węźle:</h4>
+            <pre><code th:text="${node.log}"></code></pre>
+        </div>
+    </div>
+</section>
+</body>
+</html>
